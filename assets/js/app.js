@@ -23,6 +23,56 @@ const App = {
         this.renderJobs();
     },
 
+    loadLocalData() {
+        // Check if demo data already exists
+        const existingJobs = this.getJobs();
+        const hasDemoData = existingJobs.some(job => job.isDemo);
+
+        if (!hasDemoData && existingJobs.length === 0) {
+            // Create 3 demo job postings
+            const demoJobs = [
+                {
+                    id: 'demo-001',
+                    institution: 'Colegio San Francisco - Valparaíso',
+                    position: 'Matemática - 8 horas semanales',
+                    region: 'Valparaíso',
+                    comuna: 'Valparaíso',
+                    contact: 'Iniciar sesión para ver contacto',
+                    urgency: 'Urgente - Inicio inmediato',
+                    postedBy: 'demo@clasehoy.cl',
+                    timestamp: new Date().toISOString(),
+                    isDemo: true
+                },
+                {
+                    id: 'demo-002',
+                    institution: 'Liceo Técnico Los Andes - Santiago',
+                    position: 'Lenguaje y Comunicación - 12 horas',
+                    region: 'Región Metropolitana de Santiago',
+                    comuna: 'Maipú',
+                    contact: 'Iniciar sesión para ver contacto',
+                    urgency: 'Reemplazo por licencia médica',
+                    postedBy: 'demo@clasehoy.cl',
+                    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+                    isDemo: true
+                },
+                {
+                    id: 'demo-003',
+                    institution: 'Escuela Básica Aurora - Concepción',
+                    position: 'Ed. Física - 15 horas semanales',
+                    region: 'Biobío',
+                    comuna: 'Concepción',
+                    contact: 'Iniciar sesión para ver contacto',
+                    urgency: 'Próxima semana',
+                    postedBy: 'demo@clasehoy.cl',
+                    timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
+                    isDemo: true
+                }
+            ];
+
+            localStorage.setItem('clasehoy_jobs', JSON.stringify(demoJobs));
+        }
+    },
+
     cacheDOM() {
         this.welcomeBanner = document.getElementById('welcome-banner');
         this.mainNav = document.getElementById('main-nav');

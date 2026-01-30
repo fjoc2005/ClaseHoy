@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClaseHoy - Sala de Profes</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="index.html" class="logo" style="display: flex; align-items: center; gap: 0.5rem;">
+                <img src="assets/images/logo.png" alt="ClaseHoy" style="width: 40px; height: 40px;">
+                <span>ClaseHoy</span>
+            </a>
+            <nav id="main-nav">
+                <!-- Populated by JS based on auth state -->
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mt-4">
+        <!-- Welcome banner for non-authenticated users -->
+        <div id="welcome-banner" class="hidden card"
+            style="background: linear-gradient(135deg, #6366f1, #ec4899); color: white; border: none; margin-bottom: 2rem;">
+            <div class="text-center">
+                <img src="assets/images/logo.png" alt="ClaseHoy Logo"
+                    style="width: 100px; height: 100px; margin: 0 auto 1rem; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
+                <h2 class="font-bold mb-2" style="font-size: 1.8rem;">¡Bienvenido a ClaseHoy!</h2>
+                <p class="mb-2" style="font-size: 1.1rem;">La plataforma que conecta a docentes con oportunidades de
+                    trabajo en tiempo real</p>
+                <p class="mb-4" style="font-size: 0.9rem; opacity: 0.9;">
+                    <i class="fa-solid fa-clock mr-2"></i>
+                    <strong>Avisos activos por 24 horas</strong> - Oportunidades frescas y relevantes cada día
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="register.html" class="btn" style="background: white; color: #6366f1;">
+                        <i class="fa-solid fa-user-plus mr-2"></i> Crear Perfil
+                    </a>
+                    <a href="login.html" class="btn"
+                        style="background: rgba(255,255,255,0.2); color: white; border: 1px solid white;">
+                        <i class="fa-solid fa-right-to-bracket mr-2"></i> Iniciar Sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="filters-container card">
+            <div class="flex-between mb-2">
+                <h2 class="font-bold"><i class="fa-solid fa-filter"></i> Filtros</h2>
+                <button class="btn-text text-sm" onclick="App.clearFilters()">Limpiar</button>
+            </div>
+            <div class="filter-grid">
+                <div class="input-group-compact">
+                    <select id="filter-region" onchange="App.applyFilters()">
+                        <option value="">Todas las Regiones</option>
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+                <div class="input-group-compact">
+                    <select id="filter-subject" onchange="App.applyFilters()">
+                        <option value="">Todas las Asignaturas</option>
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+                <div class="input-group-compact">
+                    <select id="filter-hours" onchange="App.applyFilters()">
+                        <option value="">Cualquier carga horaria</option>
+                        <option value="full">Jornada Completa</option>
+                        <option value="part">Media Jornada</option>
+                        <option value="block">Por Bloques</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="job-list" class="job-grid">
+            <!-- Cards injected here -->
+        </div>
+
+        <div class="text-center mt-4 mb-4">
+            <button class="btn-text" onclick="App.openTermsModal()">Términos y Condiciones</button>
+        </div>
+    </main>
+
+    <!-- Report Modal -->
+    <div id="report-modal" class="modal hidden">
+        <div class="modal-content card">
+            <span class="close-modal" onclick="App.closeReportModal()">&times;</span>
+            <h3>Reportar Publicación</h3>
+            <p class="text-muted text-sm mb-4">Ayúdanos a mantener la comunidad segura.</p>
+            <form id="report-form">
+                <textarea placeholder="Describe el problema (ej: fraude, datos falsos, ofensivo)..."
+                    required></textarea>
+                <div class="flex-end mt-4">
+                    <button type="button" class="btn btn-secondary mr-2"
+                        onclick="App.closeReportModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Enviar Reporte</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Terms Modal -->
+    <div id="terms-modal" class="modal hidden">
+        <div class="modal-content card" style="max-width: 600px;">
+            <span class="close-modal" onclick="App.closeTermsModal()">&times;</span>
+            <h3 class="font-bold mb-4">Términos y Condiciones de Uso</h3>
+            <div class="terms-content text-sm" style="max-height: 400px; overflow-y: auto; text-align: left;">
+                <p class="mb-2"><strong>La plataforma:</strong></p>
+                <ul class="mb-4" style="list-style: none; padding-left: 0;">
+                    <li>❌ No verifica antecedentes</li>
+                    <li>❌ No garantiza la veracidad de los avisos</li>
+                    <li>❌ No participa en contratos</li>
+                    <li>❌ No gestiona pagos</li>
+                </ul>
+                <p class="mb-4">La responsabilidad del contenido es exclusiva del usuario. La relación laboral es
+                    directa entre las partes.</p>
+                <p class="mb-2"><strong>La plataforma puede:</strong></p>
+                <ul class="mb-4" style="list-style: none; padding-left: 0;">
+                    <li>✅ Eliminar avisos</li>
+                    <li>✅ Bloquear usuarios</li>
+                    <li>✅ Modificar condiciones</li>
+                </ul>
+            </div>
+            <div class="flex-end mt-4">
+                <button type="button" class="btn btn-primary" onclick="App.closeTermsModal()">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/chile-data.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - ClaseHoy</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="index.html" class="logo">ClaseHoy</a>
+            <nav id="main-nav">
+                <!-- Populated by JS -->
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mt-4">
+        <div class="card text-center">
+            <div
+                style="width: 80px; height: 80px; background: linear-gradient(135deg, #6366f1, #ec4899); border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 2rem; color: white;"><i class="fa-solid fa-user"></i></span>
+            </div>
+            <h2 class="font-bold" id="user-name">Cargando...</h2>
+            <p class="text-muted mb-2" id="user-email"></p>
+            <div id="verified-badge"
+                style="display: inline-block; padding: 4px 12px; background: #dcfce7; color: #166534; border-radius: 999px; font-size: 0.75rem; font-weight: 600; margin-bottom: 1rem;">
+                <i class="fa-solid fa-circle-check"></i> Perfil Verificado
+            </div>
+
+            <div
+                style="text-align: left; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                <h3 class="font-bold mb-2"><i class="fa-solid fa-info-circle"></i> Información del Perfil</h3>
+                <div style="display: grid; gap: 0.5rem;">
+                    <p class="text-sm"><strong>Región:</strong> <span id="user-region">-</span></p>
+                    <p class="text-sm"><strong>Comuna:</strong> <span id="user-comuna">-</span></p>
+                    <p class="text-sm"><strong>Teléfono:</strong> <span id="user-telefono">-</span></p>
+                    <p class="text-sm"><strong>Asignaturas:</strong> <span id="user-subjects">-</span></p>
+                </div>
+            </div>
+
+            <button class="btn btn-secondary btn-block mt-4" onclick="Auth.logout()">
+                <i class="fa-solid fa-right-from-bracket mr-2"></i> Cerrar Sesión
+            </button>
+        </div>
+
+        <div class="card">
+            <h3 class="font-bold mb-2"><i class="fa-solid fa-clipboard-list"></i> Mis Publicaciones</h3>
+            <div id="my-posts">
+                <p class="text-muted text-sm">Cargando...</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="assets/js/chile-data.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        // Check authentication
+        if (!Auth.isAuthenticated()) {
+            window.location.href = 'login.html';
+        }
+
+        // Setup navigation
+        if (App.mainNav) {
+            App.setupNavigation();
+        }
+
+        // Load user profile
+        const user = Auth.getCurrentUser();
+        if (user) {
+            document.getElementById('user-name').textContent = user.nombre;
+            document.getElementById('user-email').textContent = user.email;
+            document.getElementById('user-region').textContent = user.region || '-';
+            document.getElementById('user-comuna').textContent = user.comuna || '-';
+            document.getElementById('user-telefono').textContent = user.telefono || 'No especificado';
+            document.getElementById('user-subjects').textContent = user.subjects && user.subjects.length > 0
+                ? user.subjects.join(', ')
+                : 'No especificado';
+
+            // Load user's posts
+            const jobs = App.getJobs();
+            const myPosts = jobs.filter(job => job.postedBy === user.email);
+            const myPostsContainer = document.getElementById('my-posts');
+
+            if (myPosts.length === 0) {
+                myPostsContainer.innerHTML = '<p class="text-muted text-sm">Aún no has publicado ningún aviso.</p>';
+            } else {
+                myPostsContainer.innerHTML = myPosts.map(job => {
+                    const posted = new Date(job.timestamp);
+                    const diffHours = (new Date() - posted) / (1000 * 60 * 60);
+                    const timeAgo = diffHours < 1
+                        ? 'Hace menos de 1 hora'
+                        : diffHours < 24
+                            ? `Hace ${Math.floor(diffHours)} horas`
+                            : `Hace ${Math.floor(diffHours / 24)} días`;
+
+                    return `
+                        <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.5rem;">
+                            <div class="flex-between">
+                                <div>
+                                    <p class="font-bold">${job.institution}</p>
+                                    <p class="text-sm">${job.position}</p>
+                                    <p class="text-xs text-muted">${job.region}, ${job.comuna || ''}</p>
+                                </div>
+                                <div style="text-align: right;">
+                                    <p class="text-xs text-muted">${timeAgo}</p>
+                                    <span class="text-xs" style="color: ${job.urgency === 'alta' ? 'var(--danger)' : 'var(--text-muted)'};">
+                                        ${job.urgency === 'alta' ? 'Urgente' : 'Normal'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+    </script>
+</body>
+
+</html>

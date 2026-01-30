@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicar Aviso - ClaseHoy</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="index.html" class="logo">ClaseHoy</a>
+            <nav id="main-nav">
+                <!-- Populated by JS -->
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mt-4">
+        <div class="card fade-in">
+            <h2 class="font-bold mb-4 gradient-text">Publicar Reemplazo</h2>
+
+            <form id="post-job-form">
+                <div class="input-group">
+                    <label for="institution">Institución Educativa</label>
+                    <input type="text" id="institution" name="institution" placeholder="Ej. Colegio San Martín"
+                        required>
+                </div>
+
+                <div class="input-group">
+                    <label for="position">Asignatura / Cargo</label>
+                    <select id="position" name="position" required>
+                        <option value="">Seleccionar asignatura...</option>
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="region">Región</label>
+                    <select id="region" name="region" required>
+                        <option value="">Seleccionar región...</option>
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="comuna">Comuna</label>
+                    <select id="comuna" name="comuna" required disabled>
+                        <option value="">Primero selecciona una región</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="contact">Contacto (Teléfono o Email)</label>
+                    <input type="text" id="contact" name="contact" placeholder="+569... o contacto@mail.com" required>
+                    <p class="text-xs text-muted mt-1"><i class="fa-solid fa-lock"></i> Solo visible para usuarios
+                        registrados</p>
+                </div>
+
+                <div class="input-group">
+                    <label for="urgency">Urgencia</label>
+                    <select id="urgency" name="urgency">
+                        <option value="normal">Normal (Reemplazo futuro)</option>
+                        <option value="alta">Alta (Para hoy/mañana)</option>
+                    </select>
+                </div>
+
+                <!-- Mandatory Legal Checkbox -->
+                <div class="input-group legal-check"
+                    style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                    <label
+                        style="display: flex; align-items: flex-start; gap: 0.5rem; cursor: pointer; font-weight: 400; font-size: 0.9em;">
+                        <input type="checkbox" id="legal-consent" required style="width: auto; margin-top: 4px;">
+                        <span>
+                            Declaro que comprendo que esta plataforma solo publica información y no actúa como
+                            intermediaria laboral, ni valida ni garantiza los avisos publicados.
+                            <br><strong class="text-xs text-muted">(🔒 Sin marcar no se publica)</strong>
+                        </span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block mt-4">
+                    <i class="fa-solid fa-paper-plane mr-2"></i> Publicar Aviso
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script src="assets/js/chile-data.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        // Check authentication
+        if (!Auth.isAuthenticated()) {
+            alert('Debes iniciar sesión para publicar un aviso');
+            window.location.href = 'login.html';
+        }
+
+        // Setup navigation
+        if (App.mainNav) {
+            App.setupNavigation();
+        }
+
+        // Populate regions
+        const regionSelect = document.getElementById('region');
+        const comunaSelect = document.getElementById('comuna');
+
+        ChileData.regions.forEach(region => {
+            const option = document.createElement('option');
+            option.value = region.nombre;
+            option.textContent = region.nombre;
+            option.dataset.regionId = region.id;
+            regionSelect.appendChild(option);
+        });
+
+        // Populate subjects
+        const positionSelect = document.getElementById('position');
+        ChileData.subjects.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject;
+            option.textContent = subject;
+            positionSelect.appendChild(option);
+        });
+
+        // Handle region change - populate communes
+        regionSelect.addEventListener('change', (e) => {
+            const selectedOption = e.target.selectedOptions[0];
+            const regionId = selectedOption.dataset.regionId;
+
+            comunaSelect.disabled = !regionId;
+            comunaSelect.innerHTML = '<option value="">Seleccionar comuna...</option>';
+
+            if (regionId) {
+                const comunas = ChileData.getComunasByRegion(regionId);
+                comunas.forEach(comuna => {
+                    const option = document.createElement('option');
+                    option.value = comuna;
+                    option.textContent = comuna;
+                    comunaSelect.appendChild(option);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

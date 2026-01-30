@@ -1,0 +1,669 @@
+:root {
+    /* Brand Colors */
+    --brand-primary: #6366f1;
+    --brand-secondary: #ec4899;
+    --brand-dark: #1e293b;
+
+    /* Role Colors */
+    --role-school: #0f172a;
+    /* Slate 900 */
+    --role-school-light: #334155;
+    --role-teacher: #4f46e5;
+    /* Indigo 600 */
+    --role-teacher-light: #818cf8;
+
+    /* Subject Colors */
+    --subject-math: #2563eb;
+    /* Blue */
+    --subject-lang: #dc2626;
+    /* Red */
+    --subject-hist: #d97706;
+    /* Amber */
+    --subject-sci: #16a34a;
+    /* Green */
+    --subject-arts: #9333ea;
+    /* Purple */
+    --subject-eng: #db2777;
+    /* Pink */
+    --subject-default: #64748b;
+
+    /* System */
+    --background: #f1f5f9;
+    --surface: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --danger: #ef4444;
+
+    --font-main: 'Outfit', system-ui, sans-serif;
+    --radius: 12px;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--background);
+    color: var(--text-main);
+    overflow-x: hidden;
+    line-height: 1.5;
+}
+
+/* Utilities */
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.text-muted {
+    color: var(--text-muted);
+    font-size: 0.9em;
+}
+
+.text-xs {
+    font-size: 0.75rem;
+}
+
+.text-sm {
+    font-size: 0.85em;
+}
+
+.text-white {
+    color: white !important;
+}
+
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-end {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.mr-2 {
+    margin-right: 0.5rem;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.mt-1 {
+    margin-top: 0.25rem;
+}
+
+.mt-4 {
+    margin-top: 1rem;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Buttons */
+.btn {
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: var(--brand-primary);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.5);
+}
+
+.btn-secondary {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-text {
+    background: none;
+    color: var(--brand-primary);
+    padding: 0;
+    text-decoration: underline;
+    font-size: 0.8rem;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-block {
+    width: 100%;
+}
+
+/* Splash Screen */
+.splash-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--brand-dark);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    transition: opacity 0.8s ease-out;
+}
+
+.splash-gif {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo-large {
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #6366f1, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.slogan {
+    margin-top: 1rem;
+    font-size: 1.2rem;
+    opacity: 0.8;
+    font-weight: 300;
+}
+
+/* Role Selection */
+.role-selection {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: url('https://source.unsplash.com/random/1920x1080/?school,architecture') no-repeat center/cover;
+    position: relative;
+}
+
+.role-selection::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(4px);
+}
+
+.role-selection .container {
+    position: relative;
+    z-index: 2;
+    color: white;
+}
+
+.role-cards {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.role-card {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 2rem;
+    border-radius: 16px;
+    width: 280px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.role-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: var(--brand-primary);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.role-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--brand-secondary);
+}
+
+/* Navigation */
+header {
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    padding: 0 1rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.logo {
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--brand-dark);
+    text-decoration: none;
+}
+
+nav a {
+    text-decoration: none;
+    color: var(--text-muted);
+    margin-left: 1.5rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+nav a.active,
+nav a:hover {
+    color: var(--brand-primary);
+}
+
+nav i {
+    margin-right: 0.25rem;
+}
+
+/* Forms */
+.input-group {
+    margin-bottom: 1.25rem;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--brand-dark);
+}
+
+input[type="text"],
+input[type="email"],
+select,
+textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #f8fafc;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    background: white;
+}
+
+/* Main App */
+main.container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* Filters */
+.filters-container {
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--brand-primary);
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.input-group-compact select {
+    width: 100%;
+    padding: 0.6rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-family: inherit;
+}
+
+/* Carnet Cards */
+.job-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.carnet {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    animation: slideUp 0.5s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* Enhanced Hover Effect */
+.carnet:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--role-teacher-light);
+}
+
+@keyframes slideUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Role Specific Card Styles */
+.carnet-institution {
+    border-top: 4px solid var(--role-school);
+}
+
+.carnet-teacher {
+    border-top: 4px solid var(--role-teacher);
+}
+
+.carnet-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.carnet-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 1rem;
+    border: 2px solid var(--border);
+}
+
+.carnet-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 99px;
+    text-transform: uppercase;
+}
+
+.badge-new {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-recent {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.subject-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.tag-math {
+    background-color: var(--subject-math);
+}
+
+.tag-lang {
+    background-color: var(--subject-lang);
+}
+
+.tag-hist {
+    background-color: var(--subject-hist);
+}
+
+.tag-sci {
+    background-color: var(--subject-sci);
+}
+
+.tag-arts {
+    background-color: var(--subject-arts);
+}
+
+.tag-eng {
+    background-color: var(--subject-eng);
+}
+
+.tag-default {
+    background-color: var(--subject-default);
+}
+
+.carnet-body p {
+    margin-bottom: 0.4rem;
+}
+
+.carnet-footer {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+}
+
+.carnet-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.disclaimer-text {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    line-height: 1.2;
+    font-style: italic;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 4px;
+    display: none;
+    margin-bottom: 0.5rem;
+}
+
+.carnet.revealed .disclaimer-text {
+    display: block;
+    animation: fadeIn 0.3s;
+}
+
+.report-btn {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.report-btn:hover {
+    color: var(--danger);
+    text-decoration: underline;
+}
+
+/* Modals */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 400px;
+    background: white;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.close-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    line-height: 1;
+}
+
+.close-modal:hover {
+    color: var(--brand-dark);
+}
+
+textarea {
+    width: 100%;
+    height: 100px;
+    margin-top: 1rem;
+}
+
+/* Authentication Pages */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1rem;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 500px;
+}
+
+.error-message {
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    margin-top: 1rem;
+}
+
+.text-primary {
+    color: var(--brand-primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.text-primary:hover {
+    text-decoration: underline;
+}
+
+.ms-2 {
+    margin-left: 0.5rem;
+}
+
+/* Responsive */
+@media(max-width: 768px) {
+    .role-cards {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .role-card {
+        width: 100%;
+        max-width: 320px;
+    }
+
+    .header-content nav span {
+        display: none;
+    }
+}

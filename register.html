@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - ClaseHoy</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-card card">
+            <div class="text-center mb-4">
+                <h1 class="logo-large gradient-text" style="font-size: 2.5rem;">ClaseHoy</h1>
+                <p class="text-muted">Crea tu perfil de docente</p>
+            </div>
+
+            <form id="register-form">
+                <div class="input-group">
+                    <label for="email"><i class="fa-solid fa-envelope"></i> Email</label>
+                    <input type="email" id="email" name="email" placeholder="tu@email.com" required>
+                    <p class="text-xs text-muted mt-1">Este será tu identificador único en la plataforma</p>
+                </div>
+
+                <div class="input-group">
+                    <label for="nombre"><i class="fa-solid fa-user"></i> Nombre Completo</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ej. María González" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="telefono"><i class="fa-solid fa-phone"></i> Teléfono</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" value="+569" readonly
+                            style="width: 70px; background: #e5e7eb; color: #6b7280; font-weight: 600;">
+                        <input type="text" id="telefono" name="telefono" placeholder="12345678" pattern="[0-9]{8}"
+                            maxlength="8" style="flex: 1;">
+                    </div>
+                    <p class="text-xs text-muted mt-1">Ingresa solo los 8 dígitos del número móvil</p>
+                </div>
+
+                <div class="input-group">
+                    <label for="region"><i class="fa-solid fa-map-marker-alt"></i> Región</label>
+                    <select id="region" name="region" required>
+                        <option value="">Seleccionar región...</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="comuna"><i class="fa-solid fa-location-dot"></i> Comuna</label>
+                    <select id="comuna" name="comuna" required disabled>
+                        <option value="">Primero selecciona una región</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="subjects"><i class="fa-solid fa-book"></i> Asignaturas que impartes</label>
+                    <select id="subjects" name="subjects" multiple size="5">
+                        <!-- Populated by JS -->
+                    </select>
+                    <p class="text-xs text-muted mt-1">Mantén presionado Ctrl (Cmd en Mac) para seleccionar varias</p>
+                </div>
+
+                <div id="error-message" class="error-message hidden"></div>
+
+                <button type="submit" class="btn btn-primary btn-block mt-4">
+                    <i class="fa-solid fa-user-plus mr-2"></i> Crear Perfil
+                </button>
+            </form>
+
+            <div class="text-center mt-4">
+                <p class="text-sm text-muted">
+                    ¿Ya tienes cuenta? <a href="login.html" class="text-primary">Inicia sesión</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/chile-data.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script>
+        // Populate regions
+        const regionSelect = document.getElementById('region');
+        const comunaSelect = document.getElementById('comuna');
+        const subjectsSelect = document.getElementById('subjects');
+
+        // Load regions
+        ChileData.regions.forEach(region => {
+            const option = document.createElement('option');
+            option.value = region.id;
+            option.textContent = region.nombre;
+            regionSelect.appendChild(option);
+        });
+
+        // Load subjects
+        ChileData.subjects.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject;
+            option.textContent = subject;
+            subjectsSelect.appendChild(option);
+        });
+
+        // Handle region change
+        regionSelect.addEventListener('change', (e) => {
+            const regionId = e.target.value;
+            comunaSelect.disabled = !regionId;
+            comunaSelect.innerHTML = '<option value="">Seleccionar comuna...</option>';
+
+            if (regionId) {
+                const comunas = ChileData.getComunasByRegion(regionId);
+                comunas.forEach(comuna => {
+                    const option = document.createElement('option');
+                    option.value = comuna;
+                    option.textContent = comuna;
+                    comunaSelect.appendChild(option);
+                });
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('register-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.classList.add('hidden');
+
+            const formData = new FormData(e.target);
+
+            // Get selected subjects
+            const selectedSubjects = Array.from(subjectsSelect.selectedOptions).map(opt => opt.value);
+
+            const userData = {
+                email: formData.get('email'),
+                nombre: formData.get('nombre'),
+                telefono: formData.get('telefono'),
+                region: regionSelect.options[regionSelect.selectedIndex].text,
+                comuna: formData.get('comuna'),
+                subjects: selectedSubjects
+            };
+
+            const result = Auth.register(userData);
+
+            if (result.success) {
+                // Redirect to main app
+                window.location.href = 'index.html';
+            } else {
+                errorDiv.textContent = result.error;
+                errorDiv.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+
+</html>

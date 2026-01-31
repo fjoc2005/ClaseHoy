@@ -92,6 +92,41 @@
             <!-- Cards injected here -->
         </div>
 
+        <!-- Testimonials Section -->
+        <div class="testimonials-section mt-8 mb-8">
+            <h2 class="text-center mb-6">Opiniones de la Comunidad</h2>
+
+            <div id="reviews-container" class="reviews-grid mb-8">
+                <!-- Reviews injected here -->
+            </div>
+
+            <div class="card p-6" style="max-width: 600px; margin: 0 auto;">
+                <h3 class="text-center mb-4">Deja tu valoración</h3>
+                <form id="review-form">
+                    <div class="form-group mb-4">
+                        <label>Nombre</label>
+                        <input type="text" name="name" required class="input-field" placeholder="Tu nombre">
+                    </div>
+                    <div class="form-group mb-4">
+                        <label>Calificación</label>
+                        <select name="rating" required class="input-field">
+                            <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
+                            <option value="4">⭐⭐⭐⭐ Muy buena</option>
+                            <option value="3">⭐⭐⭐ Buena</option>
+                            <option value="2">⭐⭐ Regular</option>
+                            <option value="1">⭐ Mala</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label>Comentario</label>
+                        <textarea name="comment" required class="input-field" rows="3"
+                            placeholder="Comparte tu experiencia..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">Enviar Opinión</button>
+                </form>
+            </div>
+        </div>
+
         <div class="text-center mt-4 mb-4">
             <a href="contact.html" class="btn-text mr-3">Contacto</a>
             <button class="btn-text" onclick="App.openTermsModal()">Términos y Condiciones</button>
@@ -122,21 +157,77 @@
             <span class="close-modal" onclick="App.closeTermsModal()">&times;</span>
             <h3 class="font-bold mb-4">Términos y Condiciones de Uso</h3>
             <div class="terms-content text-sm" style="max-height: 400px; overflow-y: auto; text-align: left;">
+                <h4 class="font-bold mb-2">1️⃣ Naturaleza del Servicio: Plataforma Informativa, No Intermediaria</h4>
+                <p class="mb-2"><strong>ClaseHoy es exclusivamente un medio de publicación de avisos.</strong></p>
+                <p class="mb-2">ClaseHoy presta un servicio digital consistente únicamente en la difusión temporal de
+                    información publicada por sus usuarios, sin intervenir directa ni indirectamente en la relación que
+                    pueda generarse entre ellos.</p>
                 <p class="mb-2"><strong>La plataforma:</strong></p>
-                <ul class="mb-4" style="list-style: none; padding-left: 0;">
-                    <li>❌ No verifica antecedentes</li>
-                    <li>❌ No garantiza la veracidad de los avisos</li>
-                    <li>❌ No participa en contratos</li>
-                    <li>❌ No gestiona pagos</li>
+                <ul class="mb-4 pl-4" style="list-style: none;">
+                    <li>❌ No actúa como empleador</li>
+                    <li>❌ No actúa como intermediario laboral</li>
+                    <li>❌ No participa en negociaciones</li>
+                    <li>❌ No gestiona contratos, pagos ni acuerdos</li>
                 </ul>
-                <p class="mb-4">La responsabilidad del contenido es exclusiva del usuario. La relación laboral es
-                    directa entre las partes.</p>
-                <p class="mb-2"><strong>La plataforma puede:</strong></p>
-                <ul class="mb-4" style="list-style: none; padding-left: 0;">
-                    <li>✅ Eliminar avisos</li>
-                    <li>✅ Bloquear usuarios</li>
-                    <li>✅ Modificar condiciones</li>
+                <p class="mb-4">Cualquier relación laboral, civil o comercial se establece directamente entre las partes
+                    involucradas, bajo su exclusiva responsabilidad.</p>
+
+                <h4 class="font-bold mb-2">2️⃣ Responsabilidad del Contenido Publicado</h4>
+                <p class="mb-2"><strong>El contenido publicado es responsabilidad exclusiva del usuario.</strong></p>
+                <p class="mb-2">Cada usuario declara y garantiza que:</p>
+                <ul class="mb-2 pl-4 list-disc">
+                    <li>La información publicada es veraz, actualizada y legítima</li>
+                    <li>Posee el derecho y autorización para publicar los datos incluidos</li>
+                    <li>Asume toda responsabilidad por el contenido del aviso</li>
                 </ul>
+                <p class="mb-4">ClaseHoy no valida, verifica ni certifica la identidad, antecedentes, títulos,
+                    experiencia ni legitimidad de los usuarios o de los avisos publicados.</p>
+
+                <h4 class="font-bold mb-2">3️⃣ Publicación de Datos Personales y Autorización</h4>
+                <p class="mb-2"><strong>Está prohibido publicar datos de terceros sin consentimiento expreso.</strong>
+                </p>
+                <ul class="mb-2 pl-4 list-disc">
+                    <li>Cuenta con la autorización del titular de los datos para publicar información personal</li>
+                    <li>No está suplantando la identidad de otra persona o institución</li>
+                </ul>
+                <p class="mb-4">ClaseHoy podrá eliminar el contenido de forma inmediata si un tercero reclama la
+                    publicación no autorizada.</p>
+
+                <h4 class="font-bold mb-2">4️⃣ Uso de la Plataforma Bajo Responsabilidad del Usuario</h4>
+                <p class="mb-2"><strong>El uso de ClaseHoy es voluntario y bajo riesgo del usuario.</strong></p>
+                <p class="mb-2">ClaseHoy no será responsable por:</p>
+                <ul class="mb-4 pl-4 list-disc">
+                    <li>Incumplimientos</li>
+                    <li>Estafas</li>
+                    <li>Daños económicos</li>
+                    <li>Conflictos laborales</li>
+                    <li>Uso indebido de la información publicada</li>
+                </ul>
+
+                <h4 class="font-bold mb-2">5️⃣ Duración y Expiración Automática de Avisos</h4>
+                <p class="mb-4">Todos los avisos tienen una duración máxima de <strong>24 horas</strong>. Expiran
+                    automáticamente y son eliminados sin posibilidad de recuperación.</p>
+
+                <h4 class="font-bold mb-2">6️⃣ Eliminación de Contenidos y Bloqueo de Usuarios</h4>
+                <p class="mb-4">ClaseHoy se reserva el derecho de moderación y podrá eliminar avisos o bloquear usuarios
+                    sin previo aviso ni indemnización.</p>
+
+                <h4 class="font-bold mb-2">7️⃣ Reportes y Reclamos</h4>
+                <p class="mb-4">ClaseHoy ofrece un mecanismo de reporte para avisos sospechosos, pero no actúa como juez
+                    ni mediador en conflictos.</p>
+
+                <h4 class="font-bold mb-2">8️⃣ Limitación de Responsabilidad</h4>
+                <p class="mb-4">En ningún caso ClaseHoy será responsable por daños directos, indirectos, morales o
+                    económicos derivados del uso de la plataforma.</p>
+
+                <h4 class="font-bold mb-2">9️⃣ Modificaciones del Servicio</h4>
+                <p class="mb-4">ClaseHoy puede modificar la plataforma y estos términos en cualquier momento. El uso
+                    continuado implica la aceptación de los cambios.</p>
+
+                <h4 class="font-bold mb-2">🔟 Aceptación de los Términos</h4>
+                <p class="mb-4"><strong>El uso de ClaseHoy implica aceptación expresa.</strong> Al registrarse y/o
+                    publicar un aviso, el usuario declara haber leído, comprendido y aceptado íntegramente estos
+                    Términos y Condiciones.</p>
             </div>
             <div class="flex-end mt-4">
                 <button type="button" class="btn btn-primary" onclick="App.closeTermsModal()">Entendido</button>
@@ -147,6 +238,13 @@
     <script src="assets/js/chile-data.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/app.js"></script>
+    <script src="assets/js/testimonials.js"></script>
+    <script>
+        // Init Testimonials on main page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof Testimonials !== 'undefined') Testimonials.init();
+        });
+    </script>
 </body>
 
 </html>

@@ -765,3 +765,68 @@ textarea {
         height: 120px;
     }
 }
+
+/* Testimonials Styles */
+.reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.review-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition: transform 0.2s ease;
+}
+
+.review-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.stars {
+    color: #f59e0b;
+    /* Amber 500 */
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+}
+
+.review-date {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.review-comment {
+    font-style: italic;
+    color: var(--text-main);
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.review-author {
+    font-weight: 600;
+    text-align: right;
+    color: var(--brand-primary);
+}
+
+/* Admin Table Responsive */
+@media (max-width: 600px) {
+    .admin-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .reviews-grid {
+        grid-template-columns: 1fr;
+    }
+}

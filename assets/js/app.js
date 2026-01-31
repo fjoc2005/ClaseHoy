@@ -33,37 +33,37 @@ const App = {
             const demoJobs = [
                 {
                     id: 'demo-001',
-                    institution: 'Colegio San Francisco - Valparaíso',
-                    position: 'Matemática - 8 horas semanales',
-                    region: 'Valparaíso',
-                    comuna: 'Valparaíso',
+                    institution: 'Colegio Arturo Prat - Ñuñoa',
+                    position: 'Profesor de Física - 30 hrs',
+                    region: 'Región Metropolitana de Santiago',
+                    comuna: 'Ñuñoa',
                     contact: 'Iniciar sesión para ver contacto',
-                    urgency: 'Urgente - Inicio inmediato',
-                    postedBy: 'demo@clasehoy.cl',
+                    urgency: 'Reemplazo Pre y Post Natal',
+                    postedBy: 'rrhh@arturoprat.cl',
                     timestamp: new Date().toISOString(),
                     isDemo: true
                 },
                 {
                     id: 'demo-002',
-                    institution: 'Liceo Técnico Los Andes - Santiago',
-                    position: 'Lenguaje y Comunicación - 12 horas',
-                    region: 'Región Metropolitana de Santiago',
-                    comuna: 'Maipú',
+                    institution: 'Liceo Bicentenario de Valparaíso',
+                    position: 'Docente de Matemáticas - 44 hrs',
+                    region: 'Valparaíso',
+                    comuna: 'Valparaíso',
                     contact: 'Iniciar sesión para ver contacto',
-                    urgency: 'Reemplazo por licencia médica',
-                    postedBy: 'demo@clasehoy.cl',
+                    urgency: 'Titularidad inmediata',
+                    postedBy: 'direccion@liceobicentenario.cl',
                     timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
                     isDemo: true
                 },
                 {
                     id: 'demo-003',
-                    institution: 'Escuela Básica Aurora - Concepción',
-                    position: 'Ed. Física - 15 horas semanales',
-                    region: 'Biobío',
-                    comuna: 'Concepción',
+                    institution: 'Colegio Inglés de La Serena',
+                    position: 'English Teacher (Native Level) - Part Time',
+                    region: 'Coquimbo',
+                    comuna: 'La Serena',
                     contact: 'Iniciar sesión para ver contacto',
-                    urgency: 'Próxima semana',
-                    postedBy: 'demo@clasehoy.cl',
+                    urgency: 'Inicio Marzo 2026',
+                    postedBy: 'recruitment@englishschool.cl',
                     timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
                     isDemo: true
                 }

@@ -24,14 +24,27 @@
     <header>
         <div class="container header-content">
             <a href="index.html" class="logo" style="display: flex; align-items: center; gap: 0.5rem;">
-                <img src="assets/images/logo.png" alt="ClaseHoy" style="width: 40px; height: 40px;">
-                <span>ClaseHoy</span>
+                <img src="assets/images/logo.png" alt="ClaseHoy"
+                    style="width: 40px; height: 40px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));">
+                <span class="gradient-text">ClaseHoy</span>
             </a>
             <nav id="main-nav">
                 <!-- Populated by JS based on auth state -->
             </nav>
         </div>
     </header>
+
+    <!-- PWA Download Banner -->
+    <div id="pwa-banner" class="pwa-banner hidden">
+        <i class="fa-solid fa-mobile-screen-button"></i>
+        <span>¡Lleva ClaseHoy en tu bolsillo!</span>
+        <a href="#" class="pwa-btn"
+            onclick="alert('Para instalar: \nEn Chrome: Menú > Instalar Aplicación\nEn Safari: Compartir > Agregar a Inicio')">
+            <i class="fa-solid fa-download"></i> Descargar App
+        </a>
+        <button class="btn-text text-white" onclick="document.getElementById('pwa-banner').classList.add('hidden')"
+            style="margin-left: 1rem; font-size: 1.2rem;">&times;</button>
+    </div>
 
     <main class="container mt-4">
         <!-- Welcome banner for non-authenticated users -->
@@ -48,12 +61,13 @@
                     <strong>Avisos activos por 24 horas</strong> - Oportunidades frescas y relevantes cada día
                 </p>
                 <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                    <a href="register.html" class="btn" style="background: white; color: #6366f1;">
-                        <i class="fa-solid fa-user-plus mr-2"></i> Crear Perfil
+                    <a href="register.html" class="btn btn-white"
+                        style="background: white; color: var(--brand-primary); font-weight: 800; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                        <i class="fa-solid fa-user-plus mr-2"></i> CREAR PERFIL
                     </a>
                     <a href="login.html" class="btn"
-                        style="background: rgba(255,255,255,0.2); color: white; border: 1px solid white;">
-                        <i class="fa-solid fa-right-to-bracket mr-2"></i> Iniciar Sesión
+                        style="background: rgba(255,255,255,0.25); color: white; border: 1px solid white; backdrop-filter: blur(4px);">
+                        <i class="fa-solid fa-right-to-bracket mr-2"></i> INGRESAR
                     </a>
                 </div>
             </div>
@@ -236,6 +250,7 @@
     </div>
 
     <script src="assets/js/chile-data.js"></script>
+    <script src="assets/js/contact-service.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/app.js"></script>
     <script src="assets/js/testimonials.js"></script>

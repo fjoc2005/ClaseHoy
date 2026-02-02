@@ -38,12 +38,53 @@
 
             <div
                 style="text-align: left; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
-                <h3 class="font-bold mb-2"><i class="fa-solid fa-info-circle"></i> Información del Perfil</h3>
-                <div style="display: grid; gap: 0.5rem;">
-                    <p class="text-sm"><strong>Región:</strong> <span id="user-region">-</span></p>
-                    <p class="text-sm"><strong>Comuna:</strong> <span id="user-comuna">-</span></p>
-                    <p class="text-sm"><strong>Teléfono:</strong> <span id="user-telefono">-</span></p>
-                    <p class="text-sm"><strong>Asignaturas:</strong> <span id="user-subjects">-</span></p>
+                <h3 class="font-bold mb-2 icon-title"><i class="fa-solid fa-info-circle"></i> Información del Perfil
+                </h3>
+                <div style="display: grid; gap: 0.8rem;">
+                    <p class="text-sm border-bottom-light pb-1"><strong><i class="fa-solid fa-map-marker-alt"></i>
+                            Ubicación:</strong> <span id="user-region">-</span>, <span id="user-comuna">-</span></p>
+                    <p class="text-sm border-bottom-light pb-1"><strong><i class="fa-solid fa-briefcase"></i>
+                            Profesión:</strong> <span id="user-subjects">-</span></p>
+                    <p class="text-sm border-bottom-light pb-1"><strong><i class="fa-solid fa-star"></i>
+                            Experiencia:</strong> <span id="user-experience">-</span></p>
+                    <p class="text-sm border-bottom-light pb-1"><strong><i class="fa-solid fa-clock"></i> Carga
+                            Horaria:</strong> <span id="user-workload">-</span></p>
+                    <p class="text-sm border-bottom-light pb-1"><strong><i class="fa-solid fa-calendar-check"></i>
+                            Disponibilidad:</strong> <span id="user-availability">-</span></p>
+                    <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+                        <strong class="text-sm block mb-1">Reseña:</strong>
+                        <p id="user-bio" class="text-sm italic text-muted">No ha añadido reseña.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opinion Form (Moved here) -->
+            <div class="mt-4 pt-4" style="border-top: 1px solid var(--border);">
+                <button class="btn btn-secondary btn-block"
+                    onclick="document.getElementById('profile-opinion-section').classList.toggle('hidden')">
+                    <i class="fa-solid fa-comment-dots mr-2"></i> Dejar una Opinión
+                </button>
+                <div id="profile-opinion-section" class="hidden mt-4 text-left">
+                    <h4 class="font-bold mb-2">Cuéntanos tu experiencia</h4>
+                    <form id="review-form">
+                        <input type="hidden" name="name" id="review-name-input">
+                        <div class="form-group mb-2">
+                            <label class="text-sm">Calificación</label>
+                            <select name="rating" required class="input-field" style="padding: 0.5rem;">
+                                <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
+                                <option value="4">⭐⭐⭐⭐ Muy buena</option>
+                                <option value="3">⭐⭐⭐ Buena</option>
+                                <option value="2">⭐⭐ Regular</option>
+                                <option value="1">⭐ Mala</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="text-sm">Comentario</label>
+                            <textarea name="comment" required class="input-field" rows="2"
+                                placeholder="Tu opinión ayuda a mejorar..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block text-sm">Enviar Opinión</button>
+                    </form>
                 </div>
             </div>
 
@@ -81,10 +122,17 @@
             document.getElementById('user-email').textContent = user.email;
             document.getElementById('user-region').textContent = user.region || '-';
             document.getElementById('user-comuna').textContent = user.comuna || '-';
-            document.getElementById('user-telefono').textContent = user.telefono || 'No especificado';
+            // document.getElementById('user-telefono').textContent = user.telefono || 'No especificado';
             document.getElementById('user-subjects').textContent = user.subjects && user.subjects.length > 0
                 ? user.subjects.join(', ')
                 : 'No especificado';
+            document.getElementById('user-experience').textContent = user.experience || 'No especificado';
+            document.getElementById('user-workload').textContent = user.workload === 'full' ? 'Jornada Completa' : (user.workload === 'mixed' ? 'Media Jornada' : 'Por Bloques');
+            document.getElementById('user-availability').textContent = user.availability || '-';
+            document.getElementById('user-bio').textContent = user.bio || 'Sin reseña.';
+
+            // Pre-fill opinion name
+            document.getElementById('review-name-input').value = user.nombre;
 
             // Load user's posts
             const jobs = App.getJobs();
@@ -92,7 +140,7 @@
             const myPostsContainer = document.getElementById('my-posts');
 
             if (myPosts.length === 0) {
-                myPostsContainer.innerHTML = '<p class="text-muted text-sm">Aún no has publicado ningún aviso.</p>';
+                myPostsContainer.innerHTML = '<p class="text-muted text-sm">Aún no has publicado ningún aviso. Si eres institución, <a href="post-job.html">publica aquí</a>.</p>';
             } else {
                 myPostsContainer.innerHTML = myPosts.map(job => {
                     const posted = new Date(job.timestamp);
@@ -107,20 +155,36 @@
                         <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.5rem;">
                             <div class="flex-between">
                                 <div>
-                                    <p class="font-bold">${job.institution}</p>
-                                    <p class="text-sm">${job.position}</p>
+                                    <p class="font-bold text-sm">${job.position}</p>
+                                    <p class="text-xs text-muted">${job.institution}</p>
                                     <p class="text-xs text-muted">${job.region}, ${job.comuna || ''}</p>
                                 </div>
                                 <div style="text-align: right;">
                                     <p class="text-xs text-muted">${timeAgo}</p>
-                                    <span class="text-xs" style="color: ${job.urgency === 'alta' ? 'var(--danger)' : 'var(--text-muted)'};">
-                                        ${job.urgency === 'alta' ? 'Urgente' : 'Normal'}
+                                    <span class="text-xs" style="font-weight:bold; color: ${job.urgency === 'alta' ? 'var(--danger)' : 'var(--text-muted)'};">
+                                        ${job.urgency === 'alta' ? 'URGENTE' : ''}
                                     </span>
                                 </div>
                             </div>
                         </div>
                     `;
                 }).join('');
+            }
+        }
+    </script>
+    <script src="assets/js/testimonials.js"></script>
+    <script>
+        // Init Testimonials Logic Form (if exists)
+        if (typeof Testimonials !== 'undefined') {
+            const form = document.getElementById('review-form');
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    // Mock submission
+                    alert('Gracias! Tu opinión ha sido registrada.');
+                    form.reset();
+                    document.getElementById('profile-opinion-section').classList.add('hidden');
+                });
             }
         }
     </script>

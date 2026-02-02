@@ -201,9 +201,11 @@ const App = {
         const formData = new FormData(this.postJobForm);
         const currentUser = Auth.getCurrentUser();
 
+        // Create Job Object
+        // Note: Institution is now the user's name
         const job = {
             id: Date.now().toString(),
-            institution: formData.get('institution'),
+            institution: currentUser.nombre, // Use profile name
             position: formData.get('position'),
             region: formData.get('region'),
             comuna: formData.get('comuna'),
@@ -282,37 +284,54 @@ const App = {
         const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(job.institution)}&background=random&color=fff`;
 
         const isAuthenticated = this.isAuthenticated();
-        const contactButton = isAuthenticated
-            ? `<button class="btn btn-primary text-sm" onclick="App.revealContact('${job.id}', '${job.contact}')">
-                 Contactar <i class="fa-solid fa-phone ms-2"></i>
-               </button>`
-            : `<button class="btn btn-secondary text-sm" onclick="window.location.href='login.html'" style="opacity: 0.7;">
-                 <i class="fa-solid fa-lock mr-2"></i> Inicia sesión para contactar
+
+        // Contact Button Logic
+        let contactButtonSource = '';
+        if (isAuthenticated) {
+            // Check if user is the owner
+            const currentUser = Auth.getCurrentUser();
+            if (currentUser.email === job.postedBy) {
+                contactButtonSource = `<button class="btn btn-secondary text-sm" disabled>Tu Publicación</button>`;
+            } else {
+                contactButtonSource = `<button class="btn btn-primary text-sm shadow-md" onclick="App.initiateContact('${job.id}')">
+                   Contactar <i class="fa-solid fa-paper-plane ms-2"></i>
+                 </button>`;
+            }
+        } else {
+            contactButtonSource = `<button class="btn btn-secondary text-sm" onclick="window.location.href='login.html'" style="opacity: 0.8;">
+                 <i class="fa-solid fa-lock mr-2"></i> Ingresar para contactar
                </button>`;
+        }
+
+        const urgencyLabel = job.urgency === 'alta' ?
+            '<span style="color:var(--danger); font-weight:700;"><i class="fa-solid fa-fire"></i> Urgencia Inmediata</span>' :
+            '<span class="text-muted"><i class="fa-solid fa-calendar"></i> Disponibilidad Normal</span>';
 
         return `
-        <article class="card carnet carnet-institution" id="card-${job.id}">
+        <article class="card carnet carnet-institution" id="card-${job.id}" style="border-top-width: 6px;">
             ${timeBadge}
             <div class="carnet-header">
-                <img src="${avatarUrl}" alt="Logo" class="carnet-avatar">
+                <img src="${avatarUrl}" alt="Logo" class="carnet-avatar shadow-sm">
                 <div>
-                    <h4 class="font-bold text-sm text-muted uppercase">Busco Profesor/a</h4>
-                    <h3 class="font-bold">${job.institution}</h3>
+                    <h4 class="font-bold text-sm text-muted uppercase">SE BUSCA DOCENTE</h4>
+                    <h3 class="font-bold text-lg text-primary">${job.institution}</h3>
                 </div>
             </div>
             
             <div class="carnet-body">
-                <span class="subject-tag ${subjectClass}">${job.position}</span>
-                <p class="text-sm"><i class="fa-solid fa-location-dot"></i> ${job.region}${job.comuna ? ', ' + job.comuna : ''}</p>
-                <p class="text-sm"><i class="fa-solid fa-clock"></i> ${job.urgency === 'alta' ? 'Urgencia Inmediata' : 'Disponibilidad Normal'}</p>
+                <div class="mb-2">
+                    <span class="subject-tag ${subjectClass}">${job.position}</span>
+                </div>
+                <p class="text-sm border-bottom-light"><i class="fa-solid fa-location-dot width-icon"></i> ${job.region}${job.comuna ? ', ' + job.comuna : ''}</p>
+                <p class="text-sm pt-1">${urgencyLabel}</p>
             </div>
 
             <div class="carnet-footer">
                 <div class="disclaimer-text">
-                    Este aviso es responsabilidad exclusiva del usuario que lo publica. La plataforma no participa en la relación laboral.
+                   El contacto solo se habilita con autorización del publicador.
                 </div>
                 <div class="carnet-actions">
-                    ${contactButton}
+                    ${contactButtonSource}
                     <button class="report-btn" onclick="App.openReportModal('${job.id}')" title="Reportar problema">
                         <i class="fa-solid fa-triangle-exclamation"></i>
                     </button>
@@ -322,12 +341,24 @@ const App = {
         `;
     },
 
-    revealContact(id, contact) {
-        const card = document.getElementById(`card-${id}`);
-        card.classList.add('revealed');
-        const btn = card.querySelector('.btn-primary');
-        btn.parentElement.innerHTML = `<a href="tel:${contact}" class="font-bold text-sm" style="color:var(--brand-primary); text-decoration:none;">${contact}</a>`;
+    initiateContact(jobId) {
+        if (!confirm('¿Deseas enviar una solicitud de contacto a este publicador?\n\nNo verás su teléfono/email hasta que acepte.')) return;
+
+        const jobs = this.getJobs();
+        const job = jobs.find(j => j.id === jobId);
+        const currentUser = Auth.getCurrentUser();
+
+        if (job && currentUser) {
+            const result = ContactService.createRequest(job, currentUser);
+            if (result.success) {
+                alert('¡Solicitud enviada con éxito!\n\nTe notificaremos cuando el publicador acepte.');
+            } else {
+                alert(result.error);
+            }
+        }
     },
+
+    // revealContact(id, contact) { ... } // Removed old method
 
     /* --- Reporting System --- */
 
@@ -358,4 +389,10 @@ const App = {
 
 document.addEventListener('DOMContentLoaded', () => {
     App.init();
+
+    // Show PWA banner if mobile view
+    if (window.innerWidth < 768 && !localStorage.getItem('pwa_dismissed')) {
+        const pwaBanner = document.getElementById('pwa-banner');
+        if (pwaBanner) pwaBanner.classList.remove('hidden');
+    }
 });

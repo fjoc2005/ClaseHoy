@@ -72,6 +72,10 @@ const Auth = {
             comuna: userData.comuna,
             subjects: userData.subjects || [],
             telefono: userData.telefono || '',
+            experience: userData.experience || '',
+            availability: userData.availability || '',
+            workload: userData.workload || '',
+            bio: userData.bio || '',
             verified: true, // For MVP, auto-verify. In production, send verification email
             createdAt: new Date().toISOString(),
             id: Date.now().toString()

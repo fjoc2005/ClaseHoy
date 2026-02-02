@@ -59,11 +59,49 @@
                 </div>
 
                 <div class="input-group">
-                    <label for="subjects"><i class="fa-solid fa-book"></i> Asignaturas que impartes</label>
-                    <select id="subjects" name="subjects" multiple size="5">
+                    <label for="subjects"><i class="fa-solid fa-briefcase"></i> Profesión / Asignatura Principal</label>
+                    <select id="subjects" name="subjects" required>
+                        <option value="">Selecciona tu especialidad...</option>
                         <!-- Populated by JS -->
                     </select>
-                    <p class="text-xs text-muted mt-1">Mantén presionado Ctrl (Cmd en Mac) para seleccionar varias</p>
+                </div>
+
+                <div class="input-group">
+                    <label for="experience"><i class="fa-solid fa-star"></i> Años de Experiencia</label>
+                    <select id="experience" name="experience" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="0-1">0 - 1 año (Recién egresado)</option>
+                        <option value="2-4">2 - 4 años</option>
+                        <option value="5-9">5 - 9 años</option>
+                        <option value="10+">Más de 10 años</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="availability"><i class="fa-solid fa-calendar-check"></i> Disponibilidad</label>
+                    <select id="availability" name="availability" required>
+                        <option value="inmediata">Inmediata</option>
+                        <option value="marzo">Marzo 2026</option>
+                        <option value="por_horas">Sólo por horas/bloques</option>
+                        <option value="reemplazos">Sólo Reemplazos</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="workload"><i class="fa-solid fa-clock"></i> Preferencia de Carga Horaria</label>
+                    <select id="workload" name="workload" required>
+                        <option value="full">Jornada Completa (44 hrs)</option>
+                        <option value="mixed">Jornada Parcial / Media</option>
+                        <option value="blocks">Por Bloques (Horas sueltas)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="bio"><i class="fa-solid fa-file-invoice"></i> Breve Reseña Curricular</label>
+                    <textarea id="bio" name="bio"
+                        placeholder="Destaca tus fortalezas, estudios adicionales o motivación (Máx 300 caracteres)"
+                        maxlength="300" style="height: 100px;"></textarea>
+                    <p class="text-xs text-muted mt-1">Esta información será visible para las instituciones.</p>
                 </div>
 
                 <div id="error-message" class="error-message hidden"></div>
@@ -139,7 +177,11 @@
                 telefono: formData.get('telefono'),
                 region: regionSelect.options[regionSelect.selectedIndex].text,
                 comuna: formData.get('comuna'),
-                subjects: selectedSubjects
+                subjects: [formData.get('subjects')], // Now single select
+                experience: formData.get('experience'),
+                availability: formData.get('availability'),
+                workload: formData.get('workload'),
+                bio: formData.get('bio')
             };
 
             const result = Auth.register(userData);

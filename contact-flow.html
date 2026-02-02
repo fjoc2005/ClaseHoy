@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Contacto - ClaseHoy</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="index.html" class="logo">ClaseHoy</a>
+        </div>
+    </header>
+
+    <main class="container mt-4" style="text-align: center; max-width: 600px;">
+        <div id="loading" class="card">
+            <p>Procesando solicitud...</p>
+        </div>
+
+        <div id="action-card" class="card hidden fade-in">
+            <div id="icon-container" style="font-size: 3rem; margin-bottom: 1rem;"></div>
+            <h2 id="title" class="font-bold mb-2"></h2>
+            <p id="message" class="text-muted mb-4"></p>
+
+            <div id="buttons-container" class="flex-center" style="gap: 1rem; justify-content: center;"></div>
+        </div>
+    </main>
+
+    <script src="assets/js/contact-service.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const viewContactToken = urlParams.get('view_contact');
+
+            const ui = {
+                loading: document.getElementById('loading'),
+                card: document.getElementById('action-card'),
+                icon: document.getElementById('icon-container'),
+                title: document.getElementById('title'),
+                msg: document.getElementById('message'),
+                btns: document.getElementById('buttons-container')
+            };
+
+            ui.loading.classList.add('hidden');
+            ui.card.classList.remove('hidden');
+
+            // 1. VIEW CONTACT INFO (Applicant View)
+            if (viewContactToken) {
+                const request = ContactService.getRequest(viewContactToken);
+                if (!request || request.status !== 'ACCEPTED') {
+                    showError('Enlace inválido o expirado.');
+                    return;
+                }
+
+                // Find the job to get the contact info
+                const jobs = JSON.parse(localStorage.getItem('clasehoy_jobs') || '[]');
+                const job = jobs.find(j => j.id === request.jobId);
+
+                if (!job) {
+                    showError('El aviso ya no está disponible.');
+                    return;
+                }
+
+                ui.icon.innerHTML = '<i class="fa-brands fa-whatsapp" style="color: #25D366;"></i>';
+                ui.title.textContent = '¡Contacto Autorizado!';
+                ui.msg.innerHTML = `El publicador de <strong>"${job.position}"</strong> ha aceptado tu solicitud.<br>Puedes contactarlo directamente.`;
+
+                const cleanPhone = job.contact.replace(/\D/g, ''); // Basic cleaning
+                // Assume it's a phone if it looks like one, else email
+
+                let actionBtn = '';
+                if (job.contact.includes('@')) {
+                    actionBtn = `<a href="mailto:${job.contact}" class="btn btn-primary"><i class="fa-solid fa-envelope mr-2"></i> Enviar Correo</a>`;
+                } else {
+                    actionBtn = `<a href="https://wa.me/${cleanPhone}" target="_blank" class="btn btn-primary" style="background-color: #25D366; border-color: #25D366;">
+                        <i class="fa-brands fa-whatsapp mr-2"></i> Abrir WhatsApp
+                     </a>`;
+                }
+
+                ui.btns.innerHTML = `
+                     ${actionBtn}
+                     <div class="mt-4 text-xs text-muted" style="border-top: 1px solid #eee; padding-top: 1rem;">
+                        ClaseHoy no participa en la conversacion ni acuerdos posteriores.
+                     </div>
+                 `;
+                return;
+            }
+
+            // 2. ACCEPT/REJECT FLOW (Publisher View)
+            if (token) {
+                // Check if we are performing an action (via query param ?action=...) or just viewing the options
+                // Actually, the email implementation usually has two distinct links: /accept?token=... and /reject?token=...
+                // But since we are mocking, we'll show the Decision Screen for the Publisher.
+
+                const request = ContactService.getRequest(token);
+
+                if (!request) {
+                    showError('Solicitud no encontrada.');
+                    return;
+                }
+
+                if (request.status !== 'PENDING') {
+                    showError(`Esta solicitud ya fue ${request.status === 'ACCEPTED' ? 'aceptada' : 'rechazada'}.`);
+                    return;
+                }
+
+                ui.icon.innerHTML = '<i class="fa-solid fa-handshake-simple" style="color: var(--brand-primary);"></i>';
+                ui.title.textContent = 'Solicitud de Contacto';
+                ui.msg.innerHTML = `
+                    El usuario <strong>${request.applicantName}</strong> está interesado en tu aviso <strong>"${request.jobTitle}"</strong>.<br>
+                    <small>¿Deseas compartir tu contacto (WhatsApp/Email) con esta persona?</small>
+                 `;
+
+                const btnAccept = document.createElement('button');
+                btnAccept.className = 'btn btn-primary';
+                btnAccept.innerHTML = '<i class="fa-brands fa-whatsapp mr-2"></i> Aceptar y Contactar';
+                btnAccept.onclick = () => {
+                    ContactService.acceptRequest(token);
+                    ui.card.innerHTML = `
+                        <div style="font-size: 3rem; color: #16a34a; margin-bottom: 1rem;"><i class="fa-solid fa-circle-check"></i></div>
+                        <h2 class="font-bold">¡Aceptado!</h2>
+                        <p>Hemos enviado un correo al postulante con tus datos de contacto.</p>
+                        <a href="index.html" class="btn btn-secondary mt-4">Volver al Inicio</a>
+                     `;
+                };
+
+                const btnReject = document.createElement('button');
+                btnReject.className = 'btn btn-danger';
+                btnReject.innerHTML = 'Rechazar';
+                btnReject.style.background = '#ef4444';
+                btnReject.onclick = () => {
+                    ContactService.rejectRequest(token);
+                    ui.card.innerHTML = `
+                        <h2 class="font-bold">Solicitud Rechazada</h2>
+                        <p>No se han compartido tus datos.</p>
+                        <a href="index.html" class="btn btn-secondary mt-4">Volver al Inicio</a>
+                     `;
+                };
+
+                ui.btns.appendChild(btnAccept);
+                ui.btns.appendChild(btnReject);
+                return;
+            }
+
+            // Default: Error
+            showError('Enlace incompleto.');
+        });
+
+        function showError(msg) {
+            const ui = {
+                icon: document.getElementById('icon-container'),
+                title: document.getElementById('title'),
+                msg: document.getElementById('message'),
+                btns: document.getElementById('buttons-container')
+            };
+            ui.icon.innerHTML = '<i class="fa-solid fa-circle-exclamation" style="color: var(--danger);"></i>';
+            ui.title.textContent = 'Error';
+            ui.msg.textContent = msg;
+            ui.btns.innerHTML = '<a href="index.html" class="btn btn-secondary">Volver al Inicio</a>';
+        }
+    </script>
+</body>
+
+</html>

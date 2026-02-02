@@ -1,49 +1,45 @@
 :root {
-    /* Brand Colors */
-    /* Brand Colors - Updated for Harmony */
-    --brand-primary: #4f46e5;
-    /* Indigo 600 - More vibrant */
-    --brand-secondary: #db2777;
-    /* Pink 600 - Complementary */
-    --brand-accent: #8b5cf6;
-    /* Violet 500 */
-    --brand-dark: #0f172a;
+    /* Brand Colors - Harmonized with New Logo */
+    --brand-primary: #0F4C81;
+    /* Classic Blue / Navy */
+    --brand-secondary: #06B6D4;
+    /* Cyan/Teal */
+    --brand-accent: #F59E0B;
+    /* Amber/Yellow */
+    --brand-dark: #1e293b;
+    /* Slate 900 */
+
+    /* Gradients */
+    --gradient-main: linear-gradient(135deg, #0F4C81 0%, #06B6D4 100%);
 
     /* Role Colors */
     --role-school: #0f172a;
-    /* Slate 900 */
     --role-school-light: #334155;
-    --role-teacher: #4f46e5;
-    /* Indigo 600 */
-    --role-teacher-light: #818cf8;
+    --role-teacher: #0891b2;
+    /* Cyan 600 */
+    --role-teacher-light: #22d3ee;
 
     /* Subject Colors */
     --subject-math: #2563eb;
-    /* Blue */
     --subject-lang: #dc2626;
-    /* Red */
     --subject-hist: #d97706;
-    /* Amber */
     --subject-sci: #16a34a;
-    /* Green */
     --subject-arts: #9333ea;
-    /* Purple */
     --subject-eng: #db2777;
-    /* Pink */
     --subject-default: #64748b;
 
     /* System */
-    --background: #f1f5f9;
+    --background: #f0f9ff;
     --surface: #ffffff;
-    --text-main: #0f172a;
+    --text-main: #334155;
     --text-muted: #64748b;
     --border: #e2e8f0;
     --danger: #ef4444;
 
     --font-main: 'Outfit', system-ui, sans-serif;
-    --radius: 12px;
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --radius: 16px;
+    --shadow: 0 4px 6px -1px rgba(15, 76, 129, 0.1), 0 2px 4px -1px rgba(15, 76, 129, 0.06);
+    --shadow-hover: 0 10px 15px -3px rgba(15, 76, 129, 0.15), 0 4px 6px -2px rgba(15, 76, 129, 0.1);
 }
 
 * {

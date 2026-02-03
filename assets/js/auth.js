@@ -157,7 +157,20 @@ const Auth = {
         const isAuthPage = currentPage === 'login.html' || currentPage === 'register.html';
 
         if (this.currentUser && isAuthPage) {
-            window.location.href = 'index.html';
+            // Instead of jarring redirect, show a friendly message
+            const container = document.querySelector('.auth-container') || document.body;
+            container.innerHTML = `
+                <div class="container mt-4 text-center">
+                    <div class="card">
+                        <h2 class="font-bold text-primary mb-2">¡Hola, ${this.currentUser.nombre || this.currentUser.email}!</h2>
+                        <p class="mb-4">Ya has iniciado sesión.</p>
+                        <div style="display: flex; gap: 1rem; justify-content: center;">
+                            <a href="index.html" class="btn btn-primary">Ir al Inicio</a>
+                            <button onclick="Auth.logout()" class="btn btn-secondary">Cerrar Sesión</button>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
     },
 

@@ -4,44 +4,89 @@
  */
 
 const BackendService = {
-    // Legacy URL for reference (unused now)
+    // Legacy URL (unused now)
     GOOGLE_SCRIPT_URL: '',
 
+    unsubscribe: null, // To store the listener unsubscribe function
+
     /**
-     * Fetch all jobs from Firestore
+     * Listen to jobs in real-time
+     * @param {Function} callback - Function to call with the updated job list
      */
-    async fetchJobs() {
-        try {
-            const snapshot = await db.collection('jobs')
-                .orderBy('timestamp', 'desc')
-                .limit(50)
-                .get();
+    listenJobs(callback) {
+        // Unsubscribe from previous listener if exists
+        if (this.unsubscribe) {
+            this.unsubscribe();
+        }
 
-            const jobs = [];
-            snapshot.forEach(doc => {
-                jobs.push(doc.data());
+        const now = firebase.firestore.Timestamp.now();
+
+        // Query: active jobs (expiresAt > now), ordered by expiration time
+        this.unsubscribe = db.collection('jobs')
+            .where('expiresAt', '>', now)
+            .orderBy('expiresAt', 'desc')
+            .onSnapshot(snapshot => {
+                const jobs = [];
+                snapshot.forEach(doc => {
+                    // Combine ID with data
+                    jobs.push({ id: doc.id, ...doc.data() });
+                });
+
+                console.log(`Real-time update: ${jobs.length} active jobs`);
+                callback(jobs);
+            }, error => {
+                console.error("Firestore listener error:", error);
+
+                // Permission denied often happens if rules are strict. 
+                // In production, ensure rules allow reading where expiresAt > now.
             });
+    },
 
-            console.log(`Fetched ${jobs.length} jobs from Firestore`);
-            return jobs;
-
-        } catch (error) {
-            console.error('Error fetching jobs from Firestore:', error);
-            return [];
+    /**
+     * Stop the real-time listener
+     */
+    stopListening() {
+        if (this.unsubscribe) {
+            this.unsubscribe();
+            this.unsubscribe = null;
         }
     },
 
     /**
-     * Save a job to Firestore
+     * Save a job to Firestore with 24h expiration
      */
-    async saveRemoteJob(job) {
+    async saveRemoteJob(jobData) {
         try {
-            // Use job.id as document ID
-            await db.collection('jobs').doc(job.id).set(job);
-            console.log('Job saved to Firestore:', job.id);
+            const now = firebase.firestore.Timestamp.now();
+            const expiresAt = firebase.firestore.Timestamp.fromMillis(
+                now.toMillis() + (24 * 60 * 60 * 1000) // +24 hours
+            );
+
+            // Clean data for Firestore
+            // ensuring we don't accidentally send undefined/null where not expected
+            const payload = {
+                title: jobData.position, // Mapping position -> title if needed, but keeping position for consistency with app
+                position: jobData.position,
+                institution: jobData.institution,
+                region: jobData.region,
+                comuna: jobData.comuna || '',
+                contact: jobData.contact,
+                urgency: jobData.urgency,
+                postedBy: jobData.postedBy,
+                createdAt: now,
+                expiresAt: expiresAt,
+
+                // Legacy fields validation
+                timestamp: now.toDate().toISOString() // Keep for backward compat if UI uses it
+            };
+
+            // Let Firestore generate the ID
+            await db.collection('jobs').add(payload);
+            console.log('Job saved to Firestore with auto-ID');
             return true;
         } catch (error) {
             console.error('Error saving job to Firestore:', error);
+            alert('Error al publicar: ' + error.message);
             return false;
         }
     },
@@ -58,14 +103,5 @@ const BackendService = {
             console.error('Error deleting job:', error);
             return false;
         }
-    },
-
-    /**
-     * Sync Jobs (Now simpler: Remote IS the source of truth)
-     * We just return remote jobs. We can merge with local if we want offline support.
-     */
-    async syncJobs(localJobs) {
-        const remoteJobs = await this.fetchJobs();
-        return remoteJobs; // For now, trust Cloud fully.
     }
 };

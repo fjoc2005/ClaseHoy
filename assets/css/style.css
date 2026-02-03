@@ -1,45 +1,56 @@
 :root {
-    /* Brand Colors - Harmonized with New Logo */
-    --brand-primary: #0F4C81;
-    /* Classic Blue / Navy */
-    --brand-secondary: #06B6D4;
-    /* Cyan/Teal */
-    --brand-accent: #F59E0B;
-    /* Amber/Yellow */
-    --brand-dark: #1e293b;
-    /* Slate 900 */
+    /* Brand Colors - New Palette (Blue, Celeste, Magenta, Emerald) */
+    --brand-primary: #004aad;
+    /* Deep Blue - Main Brand */
+    --brand-secondary: #00b4d8;
+    /* Celeste - Secondary/Accents */
+    --brand-accent: #d0006f;
+    /* Magenta - Highlights */
+    --brand-dark: #0f172a;
+    /* Dark Slate - Text/Backgrounds */
 
     /* Gradients */
-    --gradient-main: linear-gradient(135deg, #0F4C81 0%, #06B6D4 100%);
+    --gradient-main: linear-gradient(135deg, #004aad 0%, #00b4d8 100%);
 
     /* Role Colors */
-    --role-school: #0f172a;
-    --role-school-light: #334155;
-    --role-teacher: #0891b2;
-    /* Cyan 600 */
-    --role-teacher-light: #22d3ee;
+    --role-school: #004aad;
+    /* Blue for Institutions */
+    --role-school-light: #60a5fa;
+    --role-teacher: #d0006f;
+    /* Magenta for Teachers */
+    --role-teacher-light: #f472b6;
 
-    /* Subject Colors */
-    --subject-math: #2563eb;
-    --subject-lang: #dc2626;
+    /* Status/Feedback Colors */
+    --success: #00a86b;
+    /* Emerald */
+    --danger: #ef4444;
+
+    /* Subject Colors - Kept distinct but harmonized */
+    --subject-math: #004aad;
+    /* Blue */
+    --subject-lang: #d0006f;
+    /* Magenta */
     --subject-hist: #d97706;
-    --subject-sci: #16a34a;
+    /* Amber */
+    --subject-sci: #00a86b;
+    /* Emerald */
     --subject-arts: #9333ea;
-    --subject-eng: #db2777;
+    /* Purple */
+    --subject-eng: #00b4d8;
+    /* Celeste */
     --subject-default: #64748b;
 
     /* System */
-    --background: #f0f9ff;
+    --background: #f8fafc;
     --surface: #ffffff;
-    --text-main: #334155;
+    --text-main: #1e293b;
     --text-muted: #64748b;
     --border: #e2e8f0;
-    --danger: #ef4444;
 
     --font-main: 'Outfit', system-ui, sans-serif;
     --radius: 16px;
-    --shadow: 0 4px 6px -1px rgba(15, 76, 129, 0.1), 0 2px 4px -1px rgba(15, 76, 129, 0.06);
-    --shadow-hover: 0 10px 15px -3px rgba(15, 76, 129, 0.15), 0 4px 6px -2px rgba(15, 76, 129, 0.1);
+    --shadow: 0 4px 6px -1px rgba(0, 74, 173, 0.1), 0 2px 4px -1px rgba(0, 74, 173, 0.06);
+    --shadow-hover: 0 10px 15px -3px rgba(0, 74, 173, 0.15), 0 4px 6px -2px rgba(0, 74, 173, 0.1);
 }
 
 * {
@@ -144,6 +155,7 @@ body {
 .gradient-text {
     background: var(--gradient-main);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -224,6 +236,7 @@ body {
     letter-spacing: -1px;
     background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }

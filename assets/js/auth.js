@@ -156,6 +156,13 @@ const Auth = {
         const currentUser = this.getCurrentUser();
         if (!currentUser) return { success: false, error: 'No hay sesión activa' };
 
+        // If the current user is the hardcoded admin, we don't update it in local storage
+        if (currentUser.id === 'admin-universal') {
+            // For admin, we might update the session directly if needed, but not the user list
+            // For now, just return success as admin profile isn't stored in USERS_KEY
+            return { success: true, user: currentUser, message: 'Admin profile cannot be updated via this method.' };
+        }
+
         const users = this.getAllUsers();
         const userIndex = users.findIndex(u => u.email === currentUser.email);
 
@@ -166,6 +173,9 @@ const Auth = {
         // Update user data
         users[userIndex] = { ...users[userIndex], ...updates };
         localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
+
+        // Update the current session with the new user data if it's a regular user
+        this.setCurrentUser(users[userIndex]);
 
         return { success: true, user: users[userIndex] };
     },

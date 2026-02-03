@@ -24,47 +24,47 @@ const App = {
     },
 
     loadLocalData() {
-        // Check if demo data already exists
+        // ALWAYS Ensure Demo Data Exists for new devices
+        // This solves the issue of "on another phone I see nothing"
         const existingJobs = this.getJobs();
-        const hasDemoData = existingJobs.some(job => job.isDemo);
 
-        if (!hasDemoData && existingJobs.length === 0) {
-            // Create 3 demo job postings
+        // If empty, load demo data
+        if (existingJobs.length === 0) {
             const demoJobs = [
                 {
-                    id: 'demo-001',
+                    id: 'pub-001',
                     institution: 'Colegio Arturo Prat - Ñuñoa',
                     position: 'Profesor de Física - 30 hrs',
                     region: 'Región Metropolitana de Santiago',
                     comuna: 'Ñuñoa',
-                    contact: 'Iniciar sesión para ver contacto',
+                    contact: 'contacto.clasehoy@gmail.com',
                     urgency: 'Reemplazo Pre y Post Natal',
-                    postedBy: 'rrhh@arturoprat.cl',
+                    postedBy: 'contacto.clasehoy@gmail.com', // Assigned to Admin for testing
                     timestamp: new Date().toISOString(),
                     isDemo: true
                 },
                 {
-                    id: 'demo-002',
-                    institution: 'Liceo Bicentenario de Valparaíso',
+                    id: 'pub-002',
+                    institution: 'Liceo Bicentenario Valparaíso',
                     position: 'Docente de Matemáticas - 44 hrs',
                     region: 'Valparaíso',
                     comuna: 'Valparaíso',
-                    contact: 'Iniciar sesión para ver contacto',
+                    contact: 'contacto.clasehoy@gmail.com',
                     urgency: 'Titularidad inmediata',
                     postedBy: 'direccion@liceobicentenario.cl',
-                    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+                    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
                     isDemo: true
                 },
                 {
-                    id: 'demo-003',
-                    institution: 'Colegio Inglés de La Serena',
-                    position: 'English Teacher (Native Level) - Part Time',
+                    id: 'pub-003',
+                    institution: 'Colegio Inglés La Serena',
+                    position: 'English Teacher (Native Level)',
                     region: 'Coquimbo',
                     comuna: 'La Serena',
-                    contact: 'Iniciar sesión para ver contacto',
+                    contact: 'contacto.clasehoy@gmail.com',
                     urgency: 'Inicio Marzo 2026',
                     postedBy: 'recruitment@englishschool.cl',
-                    timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
+                    timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
                     isDemo: true
                 }
             ];
@@ -421,9 +421,34 @@ const App = {
 document.addEventListener('DOMContentLoaded', () => {
     App.init();
 
-    // Show PWA banner if mobile view
-    if (window.innerWidth < 768 && !localStorage.getItem('pwa_dismissed')) {
+    // Mobile Detection for Download Banner
+    // Only show if it's a mobile device (Android/iOS)
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    // Also check if already dismissed
+    const isDismissed = localStorage.getItem('pwa_dismissed');
+
+    if (isMobile && !isDismissed) {
         const pwaBanner = document.getElementById('pwa-banner');
-        if (pwaBanner) pwaBanner.classList.remove('hidden');
+        if (pwaBanner) {
+            pwaBanner.classList.remove('hidden');
+
+            // Customize text/icon based on OS
+            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const pwaBtn = pwaBanner.querySelector('.pwa-btn');
+
+            if (isIOS) {
+                pwaBtn.onclick = (e) => {
+                    e.preventDefault();
+                    alert('Para instalar en iOS:\n1. Toca el botón "Compartir" (cuadrado con flecha)\n2. Selecciona "Agregar al Inicio" (➕)');
+                };
+            } else {
+                // Android/Generic
+                pwaBtn.onclick = (e) => {
+                    e.preventDefault();
+                    alert('Para instalar:\nToca el menú del navegador (3 puntos) y selecciona "Instalar aplicación" o "Agregar a la pantalla principal".');
+                };
+            }
+        }
     }
 });

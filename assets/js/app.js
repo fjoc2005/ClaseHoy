@@ -216,6 +216,14 @@ const App = {
         };
 
         this.saveJob(job);
+
+        // Save to Cloud (Async)
+        if (typeof BackendService !== 'undefined') {
+            BackendService.saveRemoteJob(job).then(() => {
+                console.log('Job saved to cloud');
+            });
+        }
+
         window.location.href = 'index.html';
     },
 

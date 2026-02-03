@@ -1,0 +1,38 @@
+[
+    {
+        "id": "pub-001",
+        "institution": "Colegio Arturo Prat - Ñuñoa",
+        "position": "Profesor de Física - 30 hrs",
+        "region": "Región Metropolitana de Santiago",
+        "comuna": "Ñuñoa",
+        "contact": "contacto.clasehoy@gmail.com",
+        "urgency": "Reemplazo Pre y Post Natal",
+        "postedBy": "contacto.clasehoy@gmail.com",
+        "timestamp": "2026-02-02T12:00:00.000Z",
+        "isDemo": true
+    },
+    {
+        "id": "pub-002",
+        "institution": "Liceo Bicentenario Valparaíso",
+        "position": "Docente de Matemáticas - 44 hrs",
+        "region": "Valparaíso",
+        "comuna": "Valparaíso",
+        "contact": "contacto.clasehoy@gmail.com",
+        "urgency": "Titularidad inmediata",
+        "postedBy": "direccion@liceobicentenario.cl",
+        "timestamp": "2026-02-02T10:00:00.000Z",
+        "isDemo": true
+    },
+    {
+        "id": "pub-003",
+        "institution": "Colegio Inglés La Serena",
+        "position": "English Teacher (Native Level)",
+        "region": "Coquimbo",
+        "comuna": "La Serena",
+        "contact": "contacto.clasehoy@gmail.com",
+        "urgency": "Inicio Marzo 2026",
+        "postedBy": "recruitment@englishschool.cl",
+        "timestamp": "2026-02-02T08:00:00.000Z",
+        "isDemo": true
+    }
+]

@@ -413,40 +413,77 @@ const App = {
         }
     },
 
-    loadLocalData() {
-        // This method can be used to load any initial demo data if needed
+    async loadLocalData() {
+        // 1. Load Local Data
+        let jobs = this.getJobs();
+
+        // 2. Try to Sync with "Cloud" (Static JSON or Backend)
+        if (typeof BackendService !== 'undefined') {
+            try {
+                const syncedJobs = await BackendService.syncJobs(jobs);
+                if (syncedJobs.length > 0) {
+                    jobs = syncedJobs;
+                    localStorage.setItem('clasehoy_jobs', JSON.stringify(jobs));
+                }
+            } catch (e) {
+                console.warn('Sync failed, using local data');
+            }
+        }
+
+        // 3. Render
+        this.renderJobs();
     }
 };
+
+let deferredPrompt;
 
 document.addEventListener('DOMContentLoaded', () => {
     App.init();
 
-    // Mobile Detection for Download Banner
-    // Only show if it's a mobile device (Android/iOS)
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    // --- PWA Native Install Logic ---
+    const pwaBanner = document.getElementById('pwa-banner');
+    const pwaBtn = pwaBanner ? pwaBanner.querySelector('.pwa-btn') : null;
 
-    // Also check if already dismissed
-    const isDismissed = localStorage.getItem('pwa_dismissed');
+    // 1. Listen for the native event (Android/Desktop)
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent Chrome 67 and earlier from automatically showing the prompt
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        deferredPrompt = e;
 
-    if (isMobile && !isDismissed) {
-        const pwaBanner = document.getElementById('pwa-banner');
-        if (pwaBanner) {
+        // Show our UI
+        if (pwaBanner && !localStorage.getItem('pwa_dismissed')) {
             pwaBanner.classList.remove('hidden');
 
-            // Customize text/icon based on OS
-            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-            const pwaBtn = pwaBanner.querySelector('.pwa-btn');
+            // Update button behavior
+            if (pwaBtn) {
+                pwaBtn.onclick = async (evt) => {
+                    evt.preventDefault();
+                    // Show the prompt
+                    deferredPrompt.prompt();
+                    // Wait for the user to respond to the prompt
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`User response to the install prompt: ${outcome}`);
+                    // We've used the prompt, and can't use it again, throw it away
+                    deferredPrompt = null;
+                    // Hide banner
+                    pwaBanner.classList.add('hidden');
+                    localStorage.setItem('pwa_dismissed', 'true');
+                };
+            }
+        }
+    });
 
-            if (isIOS) {
+    // 2. iOS Logic (Manual Instructions)
+    // iOS does NOT support beforeinstallprompt, so we must show manual instructions
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isIOS && !localStorage.getItem('pwa_dismissed')) {
+        if (pwaBanner) {
+            pwaBanner.classList.remove('hidden');
+            if (pwaBtn) {
                 pwaBtn.onclick = (e) => {
                     e.preventDefault();
                     alert('Para instalar en iOS:\n1. Toca el botón "Compartir" (cuadrado con flecha)\n2. Selecciona "Agregar al Inicio" (➕)');
-                };
-            } else {
-                // Android/Generic
-                pwaBtn.onclick = (e) => {
-                    e.preventDefault();
-                    alert('Para instalar:\nToca el menú del navegador (3 puntos) y selecciona "Instalar aplicación" o "Agregar a la pantalla principal".');
                 };
             }
         }

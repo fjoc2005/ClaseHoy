@@ -14,30 +14,27 @@ const Auth = {
         firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
                 // User is signed in.
-                // Fetch extra profile data from Firestore
                 const doc = await db.collection('users').doc(user.uid).get();
                 if (doc.exists) {
                     this.currentUser = { ...user, ...doc.data() };
                 } else {
-                    this.currentUser = user; // Fallback
+                    this.currentUser = user;
                 }
                 console.log('User detected:', this.currentUser.email);
 
-                // If on login/register, redirect
                 this.checkSession();
 
-                // Update UI if needed
-                if (window.App && App.updateNav) App.updateNav();
+                // Update UI Integration
+                if (window.App && App.onAuthChange) App.onAuthChange(this.currentUser);
+                else if (window.App && App.updateNav) App.updateNav();
 
             } else {
                 // User is signed out.
                 this.currentUser = null;
                 console.log('User signed out');
 
-                // If on protected page, redirect
-                // this.requireAuth(); // Careful with loops
-
-                if (window.App && App.updateNav) App.updateNav();
+                if (window.App && App.onAuthChange) App.onAuthChange(null);
+                else if (window.App && App.updateNav) App.updateNav();
             }
         });
     },

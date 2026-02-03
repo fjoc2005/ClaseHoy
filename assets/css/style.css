@@ -399,6 +399,32 @@ header {
     box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.1);
 }
 
+/* Specific Fix for Filter Inputs in Dashboard */
+.filter-grid select {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--white);
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
+/* Legal Terms Footer */
+.legal-footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding: 1rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+}
+
+.legal-footer a {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
 /* PWA BANNER */
 #pwa-banner {
     position: fixed;

@@ -313,8 +313,8 @@ const App = {
             <div class="carnet-header">
                 <img src="${avatarUrl}" alt="Logo" class="carnet-avatar shadow-sm">
                 <div>
-                    <h4 class="font-bold text-sm text-muted uppercase">SE BUSCA DOCENTE</h4>
                     <h3 class="font-bold text-lg text-primary">${job.institution}</h3>
+                    <div class="text-xs text-muted mt-1">Cód: ${job.id}</div>
                 </div>
             </div>
             
@@ -328,7 +328,7 @@ const App = {
 
             <div class="carnet-footer">
                 <div class="disclaimer-text">
-                   El contacto solo se habilita con autorización del publicador.
+                    Contacto exclusivo para usuarios registrados.
                 </div>
                 <div class="carnet-actions">
                     ${contactButtonSource}
@@ -340,21 +340,37 @@ const App = {
         </article>
         `;
     },
-
     initiateContact(jobId) {
-        if (!confirm('¿Deseas enviar una solicitud de contacto a este publicador?\n\nNo verás su teléfono/email hasta que acepte.')) return;
-
         const jobs = this.getJobs();
         const job = jobs.find(j => j.id === jobId);
         const currentUser = Auth.getCurrentUser();
 
-        if (job && currentUser) {
-            const result = ContactService.createRequest(job, currentUser);
-            if (result.success) {
-                alert('¡Solicitud enviada con éxito!\n\nTe notificaremos cuando el publicador acepte.');
-            } else {
-                alert(result.error);
-            }
+        if (!job || !currentUser) return;
+
+        // Generate Message Template
+        const subject = encodeURIComponent(`Contacto Aviso Ref: ${job.id} - ${job.position}`);
+        const bodyLines = [
+            `Hola equipo ClaseHoy,`,
+            ``,
+            `Estoy interesado en el siguiente aviso:`,
+            `ID Aviso: ${job.id}`,
+            `Institución: ${job.institution}`,
+            `Cargo: ${job.position}`,
+            ``,
+            `Mis Datos de Contacto:`,
+            `Nombre: ${currentUser.nombre}`,
+            `Email: ${currentUser.email}`,
+            ``,
+            `Mensaje:`,
+            `Hola, me gustaría postular a este cargo. Quedo atento a su respuesta.`
+        ];
+        const body = encodeURIComponent(bodyLines.join('\n'));
+
+        // Open Mail Client
+        const mailtoLink = `mailto:contacto.clasehoy@gmail.com?subject=${subject}&body=${body}`;
+
+        if (confirm(`Se abrirá tu cliente de correo para enviar un mensaje a ClaseHoy sobre este aviso.\n\nReferencia: ${job.id}`)) {
+            window.location.href = mailtoLink;
         }
     },
 
@@ -375,10 +391,25 @@ const App = {
 
     submitReport() {
         if (this.state.reportingId) {
-            localStorage.setItem(`report_${this.state.reportingId}`, 'true');
+            // New Logic: Send email report instead of deleting immediately
+            const jobId = this.state.reportingId;
+            const problem = this.reportForm.querySelector('textarea').value;
+            const currentUser = Auth.getCurrentUser() || { email: 'Anónimo' };
+
+            const subject = encodeURIComponent(`Reporte de Aviso ID: ${jobId}`);
+            const body = encodeURIComponent(`He reportado el siguiente aviso:\n\nID: ${jobId}\nMotivo: ${problem}\nReportado por: ${currentUser.email}\n\nPor favor revisar.`);
+
+            // Construct mailto link
+            const mailtoLink = `mailto:contacto.clasehoy@gmail.com?subject=${subject}&body=${body}`;
+
+            // Open mail client
+            window.location.href = mailtoLink;
+
+            // Close modal
             this.closeReportModal();
-            this.renderJobs();
-            alert('Gracias. El reporte ha sido enviado y el aviso ocultado.');
+
+            // Optional: User feedback
+            alert('Se abrirá tu cliente de correo para enviar el reporte. El equipo de ClaseHoy revisará el caso.');
         }
     },
 

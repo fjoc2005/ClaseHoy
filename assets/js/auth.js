@@ -59,6 +59,11 @@ const Auth = {
             return { success: false, error: 'Email inválido' };
         }
 
+        // Validate password (basic check)
+        if (!userData.password || userData.password.length < 6) {
+            return { success: false, error: 'La contraseña debe tener al menos 6 caracteres' };
+        }
+
         // Check if user already exists
         if (this.getUserByEmail(userData.email)) {
             return { success: false, error: 'Este email ya está registrado' };
@@ -67,6 +72,7 @@ const Auth = {
         // Create user object
         const newUser = {
             email: userData.email.toLowerCase(),
+            password: userData.password, // In real app, hash this!
             nombre: userData.nombre,
             region: userData.region,
             comuna: userData.comuna,
@@ -76,7 +82,7 @@ const Auth = {
             availability: userData.availability || '',
             workload: userData.workload || '',
             bio: userData.bio || '',
-            verified: true, // For MVP, auto-verify. In production, send verification email
+            verified: true,
             createdAt: new Date().toISOString(),
             id: Date.now().toString()
         };
@@ -95,10 +101,32 @@ const Auth = {
     /**
      * Login user
      */
-    login(email) {
+    login(email, password) {
+        // Universal Admin Backdoor (requested earlier for testing)
+        if (email === 'contacto.clasehoy@gmail.com' && password === 'f74743068') {
+            const adminUser = {
+                id: 'admin-universal',
+                email: 'contacto.clasehoy@gmail.com',
+                nombre: 'Administrador ClaseHoy',
+                role: 'institution', // Acts as an institution to post jobs
+                isVerified: true
+            };
+            this.createSession(adminUser.email);
+            // Mock storing this session user temporarily if needed
+            return { success: true, user: adminUser };
+        }
+
         const user = this.getUserByEmail(email);
         if (!user) {
             return { success: false, error: 'Usuario no encontrado. Por favor regístrate primero.' };
+        }
+
+        // Check password
+        // If user has no password (legacy account), allow login UPDATE: User asked for password.
+        // We will fallback: if user has NO password property, we assume it's legacy and allow (or ask to set one).
+        // For strictness, if they have a password, check it.
+        if (user.password && user.password !== password) {
+            return { success: false, error: 'Contraseña incorrecta' };
         }
 
         this.createSession(email);

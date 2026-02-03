@@ -152,18 +152,19 @@
                             : `Hace ${Math.floor(diffHours / 24)} días`;
 
                     return `
-                        <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.5rem;">
+                        <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.5rem;" id="post-${job.id}">
                             <div class="flex-between">
                                 <div>
                                     <p class="font-bold text-sm">${job.position}</p>
                                     <p class="text-xs text-muted">${job.institution}</p>
                                     <p class="text-xs text-muted">${job.region}, ${job.comuna || ''}</p>
                                 </div>
-                                <div style="text-align: right;">
+                                <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;">
                                     <p class="text-xs text-muted">${timeAgo}</p>
-                                    <span class="text-xs" style="font-weight:bold; color: ${job.urgency === 'alta' ? 'var(--danger)' : 'var(--text-muted)'};">
-                                        ${job.urgency === 'alta' ? 'URGENTE' : ''}
-                                    </span>
+                                    
+                                    <button class="btn btn-danger text-xs" style="padding: 4px 8px;" onclick="App.deleteJob('${job.id}')">
+                                        <i class="fa-solid fa-trash"></i> Eliminar
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -171,8 +172,37 @@
                 }).join('');
             }
         }
+
+        // --- Add Delete Functionality to App context for this page ---
+        App.deleteJob = function (jobId) {
+            if (!confirm('¿Estás seguro que deseas eliminar este aviso? Esta acción no se puede deshacer.')) return;
+
+            // 1. Remove locally
+            let jobs = App.getJobs();
+            const newJobs = jobs.filter(j => j.id !== jobId);
+            localStorage.setItem('clasehoy_jobs', JSON.stringify(newJobs));
+
+            // 2. Remove UI
+            const element = document.getElementById(`post-${jobId}`);
+            if (element) element.remove();
+
+            // 3. Remove from Cloud (Best effort)
+            // Note: Our MVP backend currently supports saveJob (add/update). 
+            // We need to implement 'deleteJob' in the Google Script if we want real deletion.
+            // For now, we will assume "Updating" the list via full sync or just hiding it locally for the user.
+            // To truly delete from cloud, the Script needs an action=deleteJob. I will implement a "soft delete" or just client-side hide for now until script has that fn.
+            // Actually, let's try to send a delete request if possible.
+            if (typeof BackendService !== 'undefined' && BackendService.GOOGLE_SCRIPT_URL) {
+                fetch(BackendService.GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({ action: 'deleteJob', jobId: jobId })
+                }).then(() => console.log('Delete request sent'));
+            }
+        };
     </script>
-    <script src="assets/js/testimonials.js"></script>
+    </script>
+    <!-- Removed Testimonials script as requested -->
     <script>
         // Init Testimonials Logic Form (if exists)
         if (typeof Testimonials !== 'undefined') {

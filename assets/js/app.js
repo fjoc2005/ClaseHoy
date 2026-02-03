@@ -33,36 +33,36 @@ const App = {
             const demoJobs = [
                 {
                     id: 'pub-001',
-                    institution: 'Colegio Arturo Prat - Ñuñoa',
+                    institution: 'Juan Pérez',
                     position: 'Profesor de Física - 30 hrs',
                     region: 'Región Metropolitana de Santiago',
                     comuna: 'Ñuñoa',
                     contact: 'contacto.clasehoy@gmail.com',
-                    urgency: 'Reemplazo Pre y Post Natal',
+                    urgency: 'Disponible Inmediatamente',
                     postedBy: 'contacto.clasehoy@gmail.com', // Assigned to Admin for testing
                     timestamp: new Date().toISOString(),
                     isDemo: true
                 },
                 {
                     id: 'pub-002',
-                    institution: 'Liceo Bicentenario Valparaíso',
+                    institution: 'María González',
                     position: 'Docente de Matemáticas - 44 hrs',
                     region: 'Valparaíso',
                     comuna: 'Valparaíso',
                     contact: 'contacto.clasehoy@gmail.com',
-                    urgency: 'Titularidad inmediata',
+                    urgency: 'Reemplazo disponible',
                     postedBy: 'direccion@liceobicentenario.cl',
                     timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
                     isDemo: true
                 },
                 {
                     id: 'pub-003',
-                    institution: 'Colegio Inglés La Serena',
+                    institution: 'Carlos Ruiz',
                     position: 'English Teacher (Native Level)',
                     region: 'Coquimbo',
                     comuna: 'La Serena',
                     contact: 'contacto.clasehoy@gmail.com',
-                    urgency: 'Inicio Marzo 2026',
+                    urgency: 'Full Time',
                     postedBy: 'recruitment@englishschool.cl',
                     timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
                     isDemo: true

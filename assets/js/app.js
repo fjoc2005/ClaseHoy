@@ -30,22 +30,12 @@ const App = {
                 // Update Local Cache
                 localStorage.setItem('clasehoy_jobs', JSON.stringify(jobs));
 
-                // Auto-Seed if empty (and we are sure it's not just loading)
-                // We'll give it a grace period or check if it's the *first* load ever?
-                // For now, if jobs is empty, we can try to seed IF it's a demo environment.
-                // But let's just render.
-
-                if (jobs.length === 0) {
-                    // Check if we should auto-seed (e.g. first run)
-                    // For now, let's just let the user see "No jobs" or run the seed manual.
-                    // BUT user asked to "Pre cagar 3 demos". 
-                    // We can do this: if remote is empty, seed it.
-                    // WARNING: This might cause race conditions if multiple users open it.
-                    // Better: Just check if we need to seed LOCAL demo data for display if remote is empty?
-                    // No, user wants "demos" to see final product. 
-                    // Let's call seedDatabase() if it's completely empty AND we are the admin/dev?
-                    // Let's just run it once if we detect 0 jobs.
-                    // window.seedDatabase(); // Too risky for production.
+                // Auto-Seed if empty (Requested by User for Demos)
+                if (jobs.length === 0 && window.seedDatabase) {
+                    console.log("No jobs found. Seeding demo data...");
+                    window.seedDatabase().then(() => {
+                        console.log("Seeding initiated.");
+                    });
                 }
 
                 this.renderJobs(jobs);

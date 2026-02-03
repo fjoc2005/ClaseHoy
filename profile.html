@@ -101,6 +101,12 @@
         </div>
     </main>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+
     <script src="assets/js/chile-data.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/app.js"></script>
@@ -192,12 +198,9 @@
             // For now, we will assume "Updating" the list via full sync or just hiding it locally for the user.
             // To truly delete from cloud, the Script needs an action=deleteJob. I will implement a "soft delete" or just client-side hide for now until script has that fn.
             // Actually, let's try to send a delete request if possible.
-            if (typeof BackendService !== 'undefined' && BackendService.GOOGLE_SCRIPT_URL) {
-                fetch(BackendService.GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({ action: 'deleteJob', jobId: jobId })
-                }).then(() => console.log('Delete request sent'));
+            // 3. Remove from Cloud (Firestore)
+            if (typeof BackendService !== 'undefined') {
+                BackendService.deleteJob(jobId).then(() => alert('Aviso eliminado de la base de datos'));
             }
         };
     </script>

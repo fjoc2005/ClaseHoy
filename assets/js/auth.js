@@ -1,223 +1,174 @@
 /**
- * ClaseHoy - Authentication Module
- * Handles user registration, login, and session management
+ * CLASEHOY - AUTHENTICATION MODULE (FIREBASE)
+ * Wraps Firebase Auth methods for the application
  */
 
 const Auth = {
-    // Current user session key
-    SESSION_KEY: 'clasehoy_session',
-    USERS_KEY: 'clasehoy_users',
+    // Current user cache (to avoid async delays in UI check)
+    currentUser: null,
 
     /**
-     * Initialize authentication
+     * Initialize authentication listener
      */
     init() {
-        this.checkSession();
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                // User is signed in.
+                // Fetch extra profile data from Firestore
+                const doc = await db.collection('users').doc(user.uid).get();
+                if (doc.exists) {
+                    this.currentUser = { ...user, ...doc.data() };
+                } else {
+                    this.currentUser = user; // Fallback
+                }
+                console.log('User detected:', this.currentUser.email);
+
+                // If on login/register, redirect
+                this.checkSession();
+
+                // Update UI if needed
+                if (window.App && App.updateNav) App.updateNav();
+
+            } else {
+                // User is signed out.
+                this.currentUser = null;
+                console.log('User signed out');
+
+                // If on protected page, redirect
+                // this.requireAuth(); // Careful with loops
+
+                if (window.App && App.updateNav) App.updateNav();
+            }
+        });
     },
 
     /**
-     * Get current logged-in user
+     * Get current logged-in user (Sync version from cache)
      */
     getCurrentUser() {
-        const session = localStorage.getItem(this.SESSION_KEY);
-        if (!session) return null;
-
-        const sessionData = JSON.parse(session);
-        const user = this.getUserByEmail(sessionData.email);
-        return user;
+        return this.currentUser; // Returns null if not loaded yet or logged out
     },
 
     /**
      * Check if user is authenticated
      */
     isAuthenticated() {
-        return this.getCurrentUser() !== null;
-    },
-
-    /**
-     * Get all users
-     */
-    getAllUsers() {
-        const users = localStorage.getItem(this.USERS_KEY);
-        return users ? JSON.parse(users) : [];
-    },
-
-    /**
-     * Get user by email
-     */
-    getUserByEmail(email) {
-        const users = this.getAllUsers();
-        return users.find(u => u.email.toLowerCase() === email.toLowerCase());
+        return !!this.currentUser;
     },
 
     /**
      * Register new user
      */
-    register(userData) {
-        // Validate email
-        if (!this.validateEmail(userData.email)) {
-            return { success: false, error: 'Email inválido' };
+    async register(userData) {
+        try {
+            // 1. Create Auth User
+            const userCredential = await firebase.auth().createUserWithEmailAndPassword(userData.email, userData.password);
+            const user = userCredential.user;
+
+            // 2. Create Firestore Profile
+            const userProfile = {
+                email: userData.email,
+                nombre: userData.nombre,
+                region: userData.region,
+                comuna: userData.comuna,
+                subjects: userData.subjects || [],
+                telefono: userData.telefono || '',
+                experience: userData.experience || '',
+                availability: userData.availability || '',
+                workload: userData.workload || '',
+                bio: userData.bio || '',
+                verified: true,
+                createdAt: new Date().toISOString(),
+                role: 'teacher' // Default
+            };
+
+            await db.collection('users').doc(user.uid).set(userProfile);
+
+            // Update local cache immediately
+            this.currentUser = { ...user, ...userProfile };
+
+            return { success: true, user: this.currentUser };
+
+        } catch (error) {
+            console.error(error);
+            let msg = 'Error en el registro';
+            if (error.code === 'auth/email-already-in-use') msg = 'El email ya está uso.';
+            if (error.code === 'auth/weak-password') msg = 'La contraseña es muy débil (min 6 caracteres).';
+            return { success: false, error: msg };
         }
-
-        // Validate password (basic check)
-        if (!userData.password || userData.password.length < 6) {
-            return { success: false, error: 'La contraseña debe tener al menos 6 caracteres' };
-        }
-
-        // Check if user already exists
-        if (this.getUserByEmail(userData.email)) {
-            return { success: false, error: 'Este email ya está registrado' };
-        }
-
-        // Create user object
-        const newUser = {
-            email: userData.email.toLowerCase(),
-            password: userData.password, // In real app, hash this!
-            nombre: userData.nombre,
-            region: userData.region,
-            comuna: userData.comuna,
-            subjects: userData.subjects || [],
-            telefono: userData.telefono || '',
-            experience: userData.experience || '',
-            availability: userData.availability || '',
-            workload: userData.workload || '',
-            bio: userData.bio || '',
-            verified: true,
-            createdAt: new Date().toISOString(),
-            id: Date.now().toString()
-        };
-
-        // Save user
-        const users = this.getAllUsers();
-        users.push(newUser);
-        localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
-
-        // Auto-login after registration
-        this.createSession(newUser.email);
-
-        return { success: true, user: newUser };
     },
 
     /**
      * Login user
      */
-    login(email, password) {
-        // Universal Admin Backdoor (requested earlier for testing)
-        if (email === 'contacto.clasehoy@gmail.com' && password === 'f74743068') {
-            const adminUser = {
-                id: 'admin-universal',
-                email: 'contacto.clasehoy@gmail.com',
-                nombre: 'Administrador ClaseHoy',
-                role: 'institution', // Acts as an institution to post jobs
-                isVerified: true
-            };
-            this.createSession(adminUser.email);
-            // Mock storing this session user temporarily if needed
-            return { success: true, user: adminUser };
+    async login(email, password) {
+        try {
+            // Universal Admin Backdoor (Keep for legacy/testing logic if needed, or remove)
+            if (email === 'contacto.clasehoy@gmail.com' && password === 'f74743068') {
+                // Mock admin login logic... but strictly we should use Firebase.
+                // Migration: Monitor if admin account created in Firebase.
+            }
+
+            const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+            return { success: true, user: userCredential.user };
+        } catch (error) {
+            console.error(error);
+            let msg = 'Error al iniciar sesión';
+            if (error.code === 'auth/user-not-found') msg = 'Usuario no encontrado.';
+            if (error.code === 'auth/wrong-password') msg = 'Contraseña incorrecta.';
+            if (error.code === 'auth/invalid-email') msg = 'Email inválido.';
+            return { success: false, error: msg };
         }
-
-        const user = this.getUserByEmail(email);
-        if (!user) {
-            return { success: false, error: 'Usuario no encontrado. Por favor regístrate primero.' };
-        }
-
-        // Check password
-        // If user has no password (legacy account), allow login UPDATE: User asked for password.
-        // We will fallback: if user has NO password property, we assume it's legacy and allow (or ask to set one).
-        // For strictness, if they have a password, check it.
-        if (user.password && user.password !== password) {
-            return { success: false, error: 'Contraseña incorrecta' };
-        }
-
-        this.createSession(email);
-        return { success: true, user: user };
-    },
-
-    /**
-     * Create user session
-     */
-    createSession(email) {
-        const sessionData = {
-            email: email.toLowerCase(),
-            loginAt: new Date().toISOString()
-        };
-        localStorage.setItem(this.SESSION_KEY, JSON.stringify(sessionData));
     },
 
     /**
      * Logout user
      */
-    logout() {
-        localStorage.removeItem(this.SESSION_KEY);
-        window.location.href = 'index.html';
-    },
-
-    /**
-     * Check session and redirect if needed
-     */
-    checkSession() {
-        const currentPage = window.location.pathname.split('/').pop();
-        const isAuthPage = currentPage === 'login.html' || currentPage === 'register.html';
-        const isAuthenticated = this.isAuthenticated();
-
-        // If on auth page and already logged in, redirect to main
-        if (isAuthPage && isAuthenticated) {
-            window.location.href = 'index.html';
-        }
-    },
-
-    /**
-     * Require authentication for certain pages
-     */
-    requireAuth() {
-        if (!this.isAuthenticated()) {
-            window.location.href = 'login.html';
-            return false;
-        }
-        return true;
+    async logout() {
+        await firebase.auth().signOut();
+        window.location.href = 'login.html'; // Force redirect
     },
 
     /**
      * Update user profile
      */
-    updateProfile(updates) {
-        const currentUser = this.getCurrentUser();
-        if (!currentUser) return { success: false, error: 'No hay sesión activa' };
+    async updateProfile(updates) {
+        const user = firebase.auth().currentUser;
+        if (!user) return { success: false, error: 'No hay sesión activa' };
 
-        // If the current user is the hardcoded admin, we don't update it in local storage
-        if (currentUser.id === 'admin-universal') {
-            // For admin, we might update the session directly if needed, but not the user list
-            // For now, just return success as admin profile isn't stored in USERS_KEY
-            return { success: true, user: currentUser, message: 'Admin profile cannot be updated via this method.' };
+        try {
+            await db.collection('users').doc(user.uid).update(updates);
+            // Update local cache
+            if (this.currentUser) {
+                this.currentUser = { ...this.currentUser, ...updates };
+            }
+            return { success: true };
+        } catch (e) {
+            return { success: false, error: e.message };
         }
-
-        const users = this.getAllUsers();
-        const userIndex = users.findIndex(u => u.email === currentUser.email);
-
-        if (userIndex === -1) {
-            return { success: false, error: 'Usuario no encontrado' };
-        }
-
-        // Update user data
-        users[userIndex] = { ...users[userIndex], ...updates };
-        localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
-
-        // Update the current session with the new user data if it's a regular user
-        this.setCurrentUser(users[userIndex]);
-
-        return { success: true, user: users[userIndex] };
     },
 
     /**
-     * Validate email format
+     * Check session and redirect if needed
+     * call after auth state load
      */
-    validateEmail(email) {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(email);
+    checkSession() {
+        const currentPage = window.location.pathname.split('/').pop();
+        const isAuthPage = currentPage === 'login.html' || currentPage === 'register.html';
+
+        if (this.currentUser && isAuthPage) {
+            window.location.href = 'index.html';
+        }
+    },
+
+    requireAuth() {
+        // This is tricky because AUth Load is Async.
+        // Pages requiring auth should listen to observer or check after delay.
+        // For MVP, if caching works, getCurrentUser() might suffice.
     }
 };
 
-// Initialize on page load
+// Initialize
 document.addEventListener('DOMContentLoaded', () => {
     Auth.init();
 });

@@ -1,59 +1,71 @@
 /**
- * ClaseHoy - Backend Service
- * Handles data fetching from "Cloud" (Static JSON or Google Script)
+ * ClaseHoy - Backend Service (Firestore)
+ * Handles data fetching/saving from Firebase
  */
 
 const BackendService = {
-    // URL to the raw JSON file in GitHub (acts as "Cloud User Database")
-    // If the user updates this file in the repo, all devices will see it!
-    STATIC_DB_URL: 'assets/data/jobs.json',
-
-    // Optional: Google Script Web App URL (if deployed)
+    // Legacy URL for reference (unused now)
     GOOGLE_SCRIPT_URL: '',
 
+    /**
+     * Fetch all jobs from Firestore
+     */
     async fetchJobs() {
         try {
-            // 1. Try Google Script first if configured
-            if (this.GOOGLE_SCRIPT_URL) {
-                const response = await fetch(this.GOOGLE_SCRIPT_URL + '?action=getJobs');
-                if (response.ok) {
-                    const data = await response.json();
-                    return data.jobs || [];
-                }
-            }
+            const snapshot = await db.collection('jobs')
+                .orderBy('timestamp', 'desc')
+                .limit(50)
+                .get();
 
-            // 2. Fallback to Static GitHub JSON (The "Seed")
-            // In a real deployed environment, this fetches from the server
-            const response = await fetch(this.STATIC_DB_URL);
-            if (response.ok) {
-                const data = await response.json();
-                return data || [];
-            }
+            const jobs = [];
+            snapshot.forEach(doc => {
+                jobs.push(doc.data());
+            });
+
+            console.log(`Fetched ${jobs.length} jobs from Firestore`);
+            return jobs;
+
         } catch (error) {
-            console.error('Error fetching remote jobs:', error);
+            console.error('Error fetching jobs from Firestore:', error);
+            return [];
         }
-        return [];
     },
 
     /**
-     * Merge remote jobs with local jobs
-     * Remote jobs take precedence if IDs match (updates)
+     * Save a job to Firestore
+     */
+    async saveRemoteJob(job) {
+        try {
+            // Use job.id as document ID
+            await db.collection('jobs').doc(job.id).set(job);
+            console.log('Job saved to Firestore:', job.id);
+            return true;
+        } catch (error) {
+            console.error('Error saving job to Firestore:', error);
+            return false;
+        }
+    },
+
+    /**
+     * Delete a job from Firestore
+     */
+    async deleteJob(jobId) {
+        try {
+            await db.collection('jobs').doc(jobId).delete();
+            console.log('Job deleted from Firestore:', jobId);
+            return true;
+        } catch (error) {
+            console.error('Error deleting job:', error);
+            return false;
+        }
+    },
+
+    /**
+     * Sync Jobs (Now simpler: Remote IS the source of truth)
+     * We just return remote jobs. We can merge with local if we want offline support.
      */
     async syncJobs(localJobs) {
         const remoteJobs = await this.fetchJobs();
-
-        // Create a map of local jobs
-        const jobMap = new Map();
-        localJobs.forEach(j => jobMap.set(j.id, j));
-
-        // Merge remote jobs
-        remoteJobs.forEach(j => {
-            // Only add if it doesn't exist locally OR if we want to overwrite
-            // For this MVP, we'll assume remote is "master" for those IDs
-            jobMap.set(j.id, { ...j, isRemote: true });
-        });
-
-        return Array.from(jobMap.values())
-            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        return remoteJobs; // For now, trust Cloud fully.
     }
 };

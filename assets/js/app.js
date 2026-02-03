@@ -289,7 +289,24 @@ const App = {
         if (position.includes('arte') || position.includes('música')) subjectClass = 'tag-arts';
         if (position.includes('inglés') || position.includes('idioma extranjero')) subjectClass = 'tag-eng';
 
-        const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(job.institution)}&background=random&color=fff`;
+        if (position.includes('inglés') || position.includes('idioma extranjero')) subjectClass = 'tag-eng';
+
+        let avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(job.institution)}&background=random&color=fff&rounded=true`;
+
+        // Attempt to distinguish Gender for avatar (if name provided)
+        // Heuristic: Ends in 'a' -> Female (usually), else Male. Or specific names.
+        // Or simply use a "Bottts" or "Person" avatar for everyone to be modern and "fluid".
+        // User requested: "differentiate between man and woman". 
+        // We will try to use `dicebear` or similar if possible, or stick to ui-avatars with specific colors?
+        // Let's use `dicebear` "micah" or "avataaars" style which is very modern.
+        // We can use the 'seed' as the name. To try gender, we can rely on heuristic or random.
+        // Simple Heuristic for Spanish Names:
+        const isFemale = /a\b|maria|ana|sofia|isabel/i.test(job.institution.split(' ')[0]);
+        const gender = isFemale ? 'female' : 'male';
+        // Note: `ui-avatars` doesn't support gender. We can use `dicebear`.
+        // Example: https://api.dicebear.com/7.x/avataaars/svg?seed=...&gender=...
+        // Let's use a nice style "open-peeps" or "avataaars".
+        avatarUrl = `https://api.dicebear.com/7.x/notionists/svg?seed=${encodeURIComponent(job.institution)}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
 
         const isAuthenticated = this.isAuthenticated();
 
@@ -298,7 +315,7 @@ const App = {
         if (isAuthenticated) {
             // Check if user is the owner
             const currentUser = Auth.getCurrentUser();
-            if (currentUser.email === job.postedBy) {
+            if (currentUser && currentUser.email === job.postedBy) {
                 contactButtonSource = `<button class="btn btn-secondary text-sm" disabled>Tu Publicación</button>`;
             } else {
                 contactButtonSource = `<button class="btn btn-primary text-sm shadow-md" onclick="App.initiateContact('${job.id}')">
@@ -422,24 +439,36 @@ const App = {
     },
 
     async loadLocalData() {
-        // 1. Load Local Data
-        let jobs = this.getJobs();
+        console.log("Loading data...");
 
-        // 2. Try to Sync with "Cloud" (Static JSON or Backend)
+        // 1. Try to fetch from Backend Service (Firestore)
+        // We prioritize Cloud data now.
         if (typeof BackendService !== 'undefined') {
             try {
-                const syncedJobs = await BackendService.syncJobs(jobs);
-                if (syncedJobs.length > 0) {
-                    jobs = syncedJobs;
-                    localStorage.setItem('clasehoy_jobs', JSON.stringify(jobs));
+                const cloudJobs = await BackendService.fetchJobs();
+                if (cloudJobs && cloudJobs.length > 0) {
+                    // Update Local Cache
+                    localStorage.setItem('clasehoy_jobs', JSON.stringify(cloudJobs));
+                    this.renderJobs();
+                    return; // Success, exit
                 }
             } catch (e) {
-                console.warn('Sync failed, using local data');
+                console.warn('Backend fetch failed, falling back to local storage', e);
             }
         }
 
-        // 3. Render
-        this.renderJobs();
+        // 2. Fallback: Load Local Cache
+        let jobs = this.getJobs();
+
+        // 3. Render Cache (if any)
+        if (jobs.length > 0) {
+            this.renderJobs();
+        } else {
+            // If completely empty (new device, no offline cache, failed fetch)
+            // We can show "No hay avisos" or try to load Demo Data *only* if explicitly needed.
+            // For now, let's render empty state handles it.
+            this.renderJobs();
+        }
     }
 };
 

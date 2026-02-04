@@ -12,21 +12,38 @@ const Auth = {
      */
     init() {
         firebase.auth().onAuthStateChanged(async (user) => {
-            // Priority: Update Auth State
+            // STEP 1: IMMEDIATE AUTH STATE (Non-blocking)
             if (user) {
-                const doc = await db.collection('users').doc(user.uid).get();
-                if (doc.exists) {
-                    this.currentUser = { ...user, ...doc.data() };
-                } else {
-                    this.currentUser = user;
-                }
+                this.currentUser = user; // Set base auth immediately
+                console.log('User authenticated (Firebase):', user.email);
             } else {
                 this.currentUser = null;
+                console.log('User signed out');
             }
 
-            // Notify App
+            // Notify App IMMEDIATELY to unlock UI (Publish, Profile)
             if (window.App && App.onAuthChange) {
                 App.onAuthChange(this.currentUser);
+            }
+
+            // STEP 2: ASYNC PROFILE FETCH (Enrichment)
+            if (user) {
+                try {
+                    const doc = await db.collection('users').doc(user.uid).get();
+                    if (doc.exists) {
+                        // Merge profile data
+                        this.currentUser = { ...user, ...doc.data() };
+                        console.log('User profile loaded');
+
+                        // Notify App AGAIN with full profile (for Avatar/Role)
+                        if (window.App && App.onAuthChange) {
+                            App.onAuthChange(this.currentUser);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error loading user profile:", error);
+                    // Do NOT block access. User is still authenticated.
+                }
             }
 
             // Check Redirects
@@ -34,126 +51,131 @@ const Auth = {
         });
     },
 
-    /**
-     * Get current logged-in user (Sync version from cache)
-     */
-    getCurrentUser() {
-        return this.currentUser; // Returns null if not loaded yet or logged out
+    // Check Redirects
+    this.checkSession();
+});
     },
 
-    /**
-     * Check if user is authenticated
-     */
-    isAuthenticated() {
-        return !!this.currentUser;
-    },
+/**
+ * Get current logged-in user (Sync version from cache)
+ */
+getCurrentUser() {
+    return this.currentUser; // Returns null if not loaded yet or logged out
+},
+
+/**
+ * Check if user is authenticated
+ */
+isAuthenticated() {
+    return !!this.currentUser;
+},
 
     /**
      * Register new user
      */
     async register(userData) {
-        try {
-            // 1. Create Auth User
-            const userCredential = await firebase.auth().createUserWithEmailAndPassword(userData.email, userData.password);
-            const user = userCredential.user;
+    try {
+        // 1. Create Auth User
+        const userCredential = await firebase.auth().createUserWithEmailAndPassword(userData.email, userData.password);
+        const user = userCredential.user;
 
-            // 2. Create Firestore Profile
-            const userProfile = {
-                email: userData.email,
-                nombre: userData.nombre,
-                region: userData.region,
-                comuna: userData.comuna,
-                subjects: userData.subjects || [],
-                telefono: userData.telefono || '',
-                experience: userData.experience || '',
-                availability: userData.availability || '',
-                workload: userData.workload || '',
-                workload: userData.workload || '',
-                bio: userData.bio || '',
-                verified: true,
-                createdAt: new Date().toISOString(),
-                role: 'teacher', // Default
-                photoURL: 'assets/images/penguin-avatar.svg' // Default 3D Penguin Avatar (SVG)
-            };
+        // 2. Create Firestore Profile
+        const userProfile = {
+            email: userData.email,
+            nombre: userData.nombre,
+            region: userData.region,
+            comuna: userData.comuna,
+            subjects: userData.subjects || [],
+            telefono: userData.telefono || '',
+            experience: userData.experience || '',
+            availability: userData.availability || '',
+            workload: userData.workload || '',
+            workload: userData.workload || '',
+            bio: userData.bio || '',
+            verified: true,
+            createdAt: new Date().toISOString(),
+            role: 'teacher', // Default
+            photoURL: 'assets/images/penguin-avatar.svg' // Default 3D Penguin Avatar (SVG)
+        };
 
-            await db.collection('users').doc(user.uid).set(userProfile);
+        await db.collection('users').doc(user.uid).set(userProfile);
 
-            // Update local cache immediately
-            this.currentUser = { ...user, ...userProfile };
+        // Update local cache immediately
+        this.currentUser = { ...user, ...userProfile };
 
-            return { success: true, user: this.currentUser };
+        return { success: true, user: this.currentUser };
 
-        } catch (error) {
-            console.error(error);
-            let msg = 'Error en el registro';
-            if (error.code === 'auth/email-already-in-use') msg = 'El email ya está uso.';
-            if (error.code === 'auth/weak-password') msg = 'La contraseña es muy débil (min 6 caracteres).';
-            return { success: false, error: msg };
-        }
-    },
+    } catch (error) {
+        console.error(error);
+        let msg = 'Error en el registro';
+        if (error.code === 'auth/email-already-in-use') msg = 'El email ya está uso.';
+        if (error.code === 'auth/weak-password') msg = 'La contraseña es muy débil (min 6 caracteres).';
+        return { success: false, error: msg };
+    }
+},
 
     /**
      * Login user
      */
     async login(email, password) {
-        try {
-            // Universal Admin Backdoor (Keep for legacy/testing logic if needed, or remove)
-            if (email === 'contacto.clasehoy@gmail.com' && password === 'f74743068') {
-                // Mock admin login logic... but strictly we should use Firebase.
-                // Migration: Monitor if admin account created in Firebase.
-            }
-
-            const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
-            return { success: true, user: userCredential.user };
-        } catch (error) {
-            console.error(error);
-            let msg = 'Error al iniciar sesión';
-            if (error.code === 'auth/user-not-found') msg = 'Usuario no encontrado.';
-            if (error.code === 'auth/wrong-password') msg = 'Contraseña incorrecta.';
-            if (error.code === 'auth/invalid-email') msg = 'Email inválido.';
-            return { success: false, error: msg };
+    try {
+        // Universal Admin Backdoor (Keep for legacy/testing logic if needed, or remove)
+        if (email === 'contacto.clasehoy@gmail.com' && password === 'f74743068') {
+            // Mock admin login logic... but strictly we should use Firebase.
+            // Migration: Monitor if admin account created in Firebase.
         }
-    },
+
+        const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+        return { success: true, user: userCredential.user };
+    } catch (error) {
+        console.error(error);
+        let msg = 'Error al iniciar sesión';
+        if (error.code === 'auth/user-not-found') msg = 'Usuario no encontrado.';
+        if (error.code === 'auth/wrong-password') msg = 'Contraseña incorrecta.';
+        if (error.code === 'auth/invalid-email') msg = 'Email inválido.';
+        return { success: false, error: msg };
+    }
+},
 
     /**
      * Logout user
      */
     async logout() {
-        await firebase.auth().signOut();
-        window.location.href = 'login.html'; // Force redirect
-    },
+    await firebase.auth().signOut();
+    window.location.href = 'login.html'; // Force redirect
+},
 
     /**
      * Update user profile
      */
     async updateProfile(updates) {
-        const user = firebase.auth().currentUser;
-        if (!user) return { success: false, error: 'No hay sesión activa' };
+    const user = firebase.auth().currentUser;
+    if (!user) return { success: false, error: 'No hay sesión activa' };
 
-        try {
-            await db.collection('users').doc(user.uid).update(updates);
-            // Update local cache
-            if (this.currentUser) {
-                this.currentUser = { ...this.currentUser, ...updates };
-            }
-            return { success: true };
-        } catch (e) {
-            return { success: false, error: e.message };
+    try {
+        await db.collection('users').doc(user.uid).update(updates);
+        // Update local cache
+        if (this.currentUser) {
+            this.currentUser = { ...this.currentUser, ...updates };
         }
-    },
+        return { success: true };
+    } catch (e) {
+        return { success: false, error: e.message };
+    }
+},
 
-    /**
-     * Check session and redirect if needed
-     * call after auth state load
-     */
-    checkSession() {
-        const currentPage = window.location.pathname.split('/').pop();
-        const isAuthPage = currentPage === 'login.html' || currentPage === 'register.html';
+/**
+ * Check session and redirect if needed
+ * call after auth state load
+ */
+checkSession() {
+    const currentPage = window.location.pathname.split('/').pop();
+    const isAuthPage = currentPage === 'login.html' || currentPage === 'register.html';
 
-        if (this.currentUser && isAuthPage) {
-            // Instead of jarring redirect, show a friendly message
-            const container = document.querySelector('.auth-container') || document.body;
-            container.innerHTML = `
+    if (this.currentUser && isAuthPage) {
+        // Instead of jarring redirect, show a friendly message
+        const container = document.querySelector('.auth-container') || document.body;
+        container.innerHTML = `
                 <div class="container mt-4 text-center">
                     <div class="card">
                         <h2 class="font-bold text-primary mb-2">¡Hola, ${this.currentUser.nombre || this.currentUser.email}!</h2>
@@ -165,14 +187,14 @@ const Auth = {
                     </div>
                 </div>
             `;
-        }
-    },
-
-    requireAuth() {
-        // This is tricky because AUth Load is Async.
-        // Pages requiring auth should listen to observer or check after delay.
-        // For MVP, if caching works, getCurrentUser() might suffice.
     }
+},
+
+requireAuth() {
+    // This is tricky because AUth Load is Async.
+    // Pages requiring auth should listen to observer or check after delay.
+    // For MVP, if caching works, getCurrentUser() might suffice.
+}
 };
 
 // Initialize

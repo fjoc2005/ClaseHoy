@@ -17,13 +17,13 @@ const App = {
         this.cacheDOM();
         this.bindEvents();
 
-        // Setup initial UI structure (but let Auth populate content)
+        // Setup initial UI structure immediately (Static Layout)
         this.setupNavigation();
         this.populateFilters();
 
-        // Note: We do NOT hide body/nav here proactively because it causes
-        // flicker if the user is already treated as guest by default HTML.
-        // We let onAuthChange update the state when Firebase responds.
+        // Note: Removed proactive hiding of UI elements.
+        // The Job List and static content must render immediately.
+        // Auth state will update the Nav/Buttons asynchronously.
 
         // Initialize Auth Listener to update UI when ready
         // Auth.init() is already called in auth.js, but we need to react to it.

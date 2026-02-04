@@ -73,10 +73,12 @@ const Auth = {
                 experience: userData.experience || '',
                 availability: userData.availability || '',
                 workload: userData.workload || '',
+                workload: userData.workload || '',
                 bio: userData.bio || '',
                 verified: true,
                 createdAt: new Date().toISOString(),
-                role: 'teacher' // Default
+                role: 'teacher', // Default
+                photoURL: 'assets/images/penguin-avatar.svg' // Default 3D Penguin Avatar (SVG)
             };
 
             await db.collection('users').doc(user.uid).set(userProfile);

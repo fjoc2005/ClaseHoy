@@ -1,0 +1,31 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="100" fill="#e0f2fe"/>
+  
+  <!-- Penguin Body -->
+  <ellipse cx="100" cy="115" rx="50" ry="60" fill="#0f172a"/>
+  
+  <!-- White Belly -->
+  <ellipse cx="100" cy="120" rx="35" ry="45" fill="white"/>
+  
+  <!-- Eyes -->
+  <circle cx="85" cy="100" r="5" fill="white"/>
+  <circle cx="115" cy="100" r="5" fill="white"/>
+  <circle cx="85" cy="100" r="2" fill="black"/>
+  <circle cx="115" cy="100" r="2" fill="black"/>
+  
+  <!-- Beak -->
+  <path d="M95 110 L105 110 L100 120 Z" fill="#f59e0b"/>
+  
+  <!-- Feet -->
+  <path d="M70 165 C70 165, 80 160, 90 165" stroke="#f59e0b" stroke-width="8" stroke-linecap="round"/>
+  <path d="M110 165 C110 165, 120 160, 130 165" stroke="#f59e0b" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- Beanie (Gorro) -->
+  <path d="M60 85 Q100 50 140 85 Z" fill="#ef4444"/>
+  <circle cx="100" cy="65" r="10" fill="#ef4444"/>
+  
+  <!-- Scarf (Bufanda) -->
+  <path d="M70 130 Q100 145 130 130" stroke="#10b981" stroke-width="12" stroke-linecap="round"/>
+  <path d="M120 135 L120 155" stroke="#10b981" stroke-width="10" stroke-linecap="round"/>
+</svg>

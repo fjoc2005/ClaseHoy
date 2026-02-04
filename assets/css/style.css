@@ -137,16 +137,17 @@ header {
     align-items: center;
 }
 
-.logo {
-    font-weight: 800;
-    font-size: 1.5rem;
-    color: var(--primary);
-    /* Fallback */
-    background: var(--gradient-accent);
-    /* Logo uses Accent gradient */
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+/* LOGO FIX (OBLIGATORIO) */
+.logo img {
+    width: 40px !important;
+    height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    object-fit: contain;
+    display: block;
+    margin-right: 0.5rem;
 }
 
 #main-nav {

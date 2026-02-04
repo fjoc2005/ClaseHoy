@@ -12,30 +12,25 @@ const Auth = {
      */
     init() {
         firebase.auth().onAuthStateChanged(async (user) => {
+            // Priority: Update Auth State
             if (user) {
-                // User is signed in.
                 const doc = await db.collection('users').doc(user.uid).get();
                 if (doc.exists) {
                     this.currentUser = { ...user, ...doc.data() };
                 } else {
                     this.currentUser = user;
                 }
-                console.log('User detected:', this.currentUser.email);
-
-                this.checkSession();
-
-                // Update UI Integration
-                if (window.App && App.onAuthChange) App.onAuthChange(this.currentUser);
-                else if (window.App && App.updateNav) App.updateNav();
-
             } else {
-                // User is signed out.
                 this.currentUser = null;
-                console.log('User signed out');
-
-                if (window.App && App.onAuthChange) App.onAuthChange(null);
-                else if (window.App && App.updateNav) App.updateNav();
             }
+
+            // Notify App
+            if (window.App && App.onAuthChange) {
+                App.onAuthChange(this.currentUser);
+            }
+
+            // Check Redirects
+            this.checkSession();
         });
     },
 

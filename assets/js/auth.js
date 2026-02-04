@@ -1,15 +1,3 @@
-// Escuchar estado global de autenticación
-firebase.auth().onAuthStateChanged((user) => {
-  if (user) {
-    // Usuario logueado
-    console.log("Usuario conectado:", user.email);
-    App.setLoggedUser(user); // función que deberías tener para mostrar UI logueada
-    App.showAuthenticatedUI(); // ejemplo
-  } else {
-    console.log("Usuario no conectado.");
-    App.clearUserState(); // función que deberías tener para restaurar UI público
-  }
-});
 /**
  * CLASEHOY - AUTHENTICATION MODULE (FIREBASE)
  * Wraps Firebase Auth methods for the application

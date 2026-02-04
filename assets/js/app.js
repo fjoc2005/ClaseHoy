@@ -376,13 +376,13 @@ const App = {
         // Avatar Strategy:
         // 1. Use user's photoURL if valid (e.g. from Profile)
         // 2. Fallback to 3D Penguin Legacy (Default)
-        let avatarUrl = job.photoURL || 'assets/images/penguin-avatar.png';
+        let avatarUrl = job.photoURL || 'assets/images/penguin-avatar.svg';
 
         // Legacy cleanup: If old demo data has dicebear, replace it visually if desired, 
         // or just accept it. Instruction says "Asignar... a cada perfil".
         // Use penguin if specific conditions met (e.g. missing or placeholder)
         if (!avatarUrl || avatarUrl.includes('dicebear') || avatarUrl.includes('ui-avatars')) {
-            avatarUrl = 'assets/images/penguin-avatar.png';
+            avatarUrl = 'assets/images/penguin-avatar.svg';
         }
 
         const isAuthenticated = this.isAuthenticated();

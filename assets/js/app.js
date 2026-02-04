@@ -1,5 +1,5 @@
 /**
- * ClaseHoy - Core Logic (SAFE MODE)
+ * ClaseHoy - Core Logic (SAFE MODE ESTABLE)
  */
 
 const App = {
@@ -15,22 +15,24 @@ const App = {
     init() {
         this.cacheDOM();
         this.bindEvents();
-
-        // ⚠️ BLINDAJE: no romper si algo falta
         this.setupNavigation();
 
+        // Poblar filtros (si existe)
         if (typeof this.populateFilters === 'function') {
             this.populateFilters();
-        } else {
-            console.warn('populateFilters() no disponible – continuando sin filtros');
         }
 
-        // Auth reactivo (fuente única de verdad)
-        if (window.Auth && Auth.getCurrentUser) {
+        // 🔑 Conexión REAL con Auth
+        if (window.Auth && typeof Auth.onAuthStateChanged === 'function') {
+            Auth.onAuthStateChanged((user) => {
+                this.onAuthChange(user);
+            });
+        } else if (window.Auth && Auth.getCurrentUser) {
             this.state.currentUser = Auth.getCurrentUser();
+            this.setupNavigation();
         }
 
-        // Listener Firestore
+        // 🔥 Listener Firestore
         if (window.BackendService && BackendService.listenJobs) {
             BackendService.listenJobs((jobs) => {
                 localStorage.setItem('clasehoy_jobs', JSON.stringify(jobs));
@@ -44,7 +46,7 @@ const App = {
     onAuthChange(user) {
         this.state.currentUser = user;
         this.setupNavigation();
-        this.renderJobs();
+        this.renderJobs(this.getJobs());
     },
 
     cacheDOM() {
@@ -52,9 +54,20 @@ const App = {
         this.jobList = document.getElementById('job-list');
         this.filterRegion = document.getElementById('filter-region');
         this.filterSubject = document.getElementById('filter-subject');
+        this.filterHours = document.getElementById('filter-hours');
     },
 
-    bindEvents() {},
+    bindEvents() {
+        if (this.filterRegion) {
+            this.filterRegion.addEventListener('change', () => this.applyFilters());
+        }
+        if (this.filterSubject) {
+            this.filterSubject.addEventListener('change', () => this.applyFilters());
+        }
+        if (this.filterHours) {
+            this.filterHours.addEventListener('change', () => this.applyFilters());
+        }
+    },
 
     isAuthenticated() {
         return !!this.state.currentUser;
@@ -96,6 +109,31 @@ const App = {
         });
     },
 
+    applyFilters() {
+        const jobs = this.getJobs();
+
+        const region = this.filterRegion?.value || '';
+        const subject = this.filterSubject?.value || '';
+        const hours = this.filterHours?.value || '';
+
+        const filtered = jobs.filter(j => {
+            return (
+                (!region || j.region === region) &&
+                (!subject || j.subject === subject) &&
+                (!hours || j.hours === hours)
+            );
+        });
+
+        this.renderJobs(filtered);
+    },
+
+    clearFilters() {
+        if (this.filterRegion) this.filterRegion.value = '';
+        if (this.filterSubject) this.filterSubject.value = '';
+        if (this.filterHours) this.filterHours.value = '';
+        this.renderJobs(this.getJobs());
+    },
+
     getJobs() {
         return JSON.parse(localStorage.getItem('clasehoy_jobs') || '[]');
     },
@@ -110,8 +148,8 @@ const App = {
 
         this.jobList.innerHTML = jobs.map(j => `
             <div class="card">
-                <h3>${j.institution}</h3>
-                <p>${j.position}</p>
+                <h3>${j.institution || 'Institución'}</h3>
+                <p>${j.position || 'Cargo'}</p>
             </div>
         `).join('');
     }

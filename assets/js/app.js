@@ -411,7 +411,7 @@ const App = {
                 <img src="${avatarUrl}" alt="Logo" class="carnet-avatar shadow-sm">
                 <div>
                     <h3 class="font-bold text-lg text-primary">${job.institution}</h3>
-                    <div class="text-xs text-muted mt-1">Cód: ${job.id}</div>
+                    <!-- ID Hidden from UI, kept in data attribute for logic -->
                 </div>
             </div>
             
@@ -429,13 +429,39 @@ const App = {
                 </div>
                 <div class="carnet-actions">
                     ${contactButtonSource}
-                    <button class="report-btn" onclick="App.openReportModal('${job.id}')" title="Reportar problema">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                    </button>
+                    ${isAuthenticated && Auth.getCurrentUser() && Auth.getCurrentUser().email === job.postedBy ?
+                `<button class="btn btn-danger text-sm" onclick="App.deleteJob('${job.id}')" title="Eliminar mi aviso">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>` : ''
+            }
                 </div>
             </div>
         </article>
         `;
+    },
+
+    async deleteJob(jobId) {
+        if (!confirm("¿Estás seguro de que quieres eliminar este aviso?")) return;
+
+        try {
+            await BackendService.deleteJob(jobId);
+            alert("Aviso eliminado correctamente.");
+            // Manual remove from DOM to feel instant
+            const card = document.getElementById(`card-${jobId}`);
+            if (card) card.remove();
+        } catch (error) {
+            console.error("Error deleting job:", error);
+            alert("Error al eliminar el aviso.");
+        }
+    },
+    ${ contactButtonSource }
+<button class="report-btn" onclick="App.openReportModal('${job.id}')" title="Reportar problema">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+</button>
+                </div >
+            </div >
+        </article >
+    `;
     },
     initiateContact(jobId) {
         const jobs = this.getJobs();
@@ -445,28 +471,28 @@ const App = {
         if (!job || !currentUser) return;
 
         // Generate Message Template
-        const subject = encodeURIComponent(`Contacto Aviso Ref: ${job.id} - ${job.position}`);
+        const subject = encodeURIComponent(`Contacto Aviso Ref: ${ job.id } - ${ job.position } `);
         const bodyLines = [
-            `Hola equipo ClaseHoy,`,
+            `Hola equipo ClaseHoy, `,
             ``,
-            `Estoy interesado en el siguiente aviso:`,
-            `ID Aviso: ${job.id}`,
-            `Institución: ${job.institution}`,
-            `Cargo: ${job.position}`,
+            `Estoy interesado en el siguiente aviso: `,
+            `ID Aviso: ${ job.id } `,
+            `Institución: ${ job.institution } `,
+            `Cargo: ${ job.position } `,
             ``,
-            `Mis Datos de Contacto:`,
-            `Nombre: ${currentUser.nombre}`,
-            `Email: ${currentUser.email}`,
+            `Mis Datos de Contacto: `,
+            `Nombre: ${ currentUser.nombre } `,
+            `Email: ${ currentUser.email } `,
             ``,
-            `Mensaje:`,
-            `Hola, me gustaría postular a este cargo. Quedo atento a su respuesta.`
+            `Mensaje: `,
+            `Hola, me gustaría postular a este cargo.Quedo atento a su respuesta.`
         ];
         const body = encodeURIComponent(bodyLines.join('\n'));
 
         // Open Mail Client
-        const mailtoLink = `mailto:contacto.clasehoy@gmail.com?subject=${subject}&body=${body}`;
+        const mailtoLink = `mailto: contacto.clasehoy@gmail.com?subject = ${ subject }& body=${ body } `;
 
-        if (confirm(`Se abrirá tu cliente de correo para enviar un mensaje a ClaseHoy sobre este aviso.\n\nReferencia: ${job.id}`)) {
+        if (confirm(`Se abrirá tu cliente de correo para enviar un mensaje a ClaseHoy sobre este aviso.\n\nReferencia: ${ job.id } `)) {
             window.location.href = mailtoLink;
         }
     },
@@ -493,11 +519,11 @@ const App = {
             const problem = this.reportForm.querySelector('textarea').value;
             const currentUser = Auth.getCurrentUser() || { email: 'Anónimo' };
 
-            const subject = encodeURIComponent(`Reporte de Aviso ID: ${jobId}`);
-            const body = encodeURIComponent(`He reportado el siguiente aviso:\n\nID: ${jobId}\nMotivo: ${problem}\nReportado por: ${currentUser.email}\n\nPor favor revisar.`);
+            const subject = encodeURIComponent(`Reporte de Aviso ID: ${ jobId } `);
+            const body = encodeURIComponent(`He reportado el siguiente aviso: \n\nID: ${ jobId } \nMotivo: ${ problem } \nReportado por: ${ currentUser.email } \n\nPor favor revisar.`);
 
             // Construct mailto link
-            const mailtoLink = `mailto:contacto.clasehoy@gmail.com?subject=${subject}&body=${body}`;
+            const mailtoLink = `mailto: contacto.clasehoy@gmail.com?subject = ${ subject }& body=${ body } `;
 
             // Open mail client
             window.location.href = mailtoLink;
@@ -561,7 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     deferredPrompt.prompt();
                     // Wait for the user to respond to the prompt
                     const { outcome } = await deferredPrompt.userChoice;
-                    console.log(`User response to the install prompt: ${outcome}`);
+                    console.log(`User response to the install prompt: ${ outcome } `);
                     // We've used the prompt, and can't use it again, throw it away
                     deferredPrompt = null;
                     // Hide banner

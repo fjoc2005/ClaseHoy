@@ -138,7 +138,7 @@ header {
 }
 
 /* LOGO FIX (OBLIGATORIO) */
-.logo img {
+.logo-img {
     width: 40px !important;
     height: 40px !important;
     max-width: 40px !important;

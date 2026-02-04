@@ -14,29 +14,29 @@ async function seedDatabase() {
 
     const demos = [
         {
-            institution: 'Colegio San Mateo',
-            position: 'Profesor de Matemáticas (Reemplazo)',
+            institution: 'Prof. Andrea Muñoz',
+            position: 'Reemplazo Matemáticas - 1 Sem',
             region: 'Región Metropolitana de Santiago',
             comuna: 'Providencia',
-            contact: 'contacto@colegiosanmateo.cl',
+            contact: 'andrea.munoz@gmail.com',
             urgency: 'alta',
             postedBy: 'admin@clasehoy.cl'
         },
         {
-            institution: 'Liceo Bicentenario',
-            position: 'Docente de Lenguaje - 30 hrs',
+            institution: 'Prof. Ricardo Lagos',
+            position: 'Docente Lenguaje - 30 hrs',
             region: 'Valparaíso',
             comuna: 'Viña del Mar',
-            contact: 'utp@liceobicentenario.cl',
+            contact: 'ricardo.lagos@gmail.com',
             urgency: 'normal',
             postedBy: 'admin@clasehoy.cl'
         },
         {
-            institution: 'Escuela Rural Los Andes',
-            position: 'Profesor General Básica',
+            institution: 'Prof. Claudia Pérez',
+            position: 'General Básica - Tarde',
             region: 'Los Lagos',
             comuna: 'Puerto Montt',
-            contact: 'director@escuelalosandes.cl',
+            contact: 'claudia.perez@gmail.com',
             urgency: 'normal',
             postedBy: 'admin@clasehoy.cl'
         }

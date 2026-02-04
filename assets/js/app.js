@@ -16,8 +16,13 @@ const App = {
     init() {
         this.cacheDOM();
         this.bindEvents();
-        // this.loadCurrentUser(); // Removed: Handled by Auth.init callback
-        this.setupNavigation();
+
+        // Initial State: Hide everything until Auth is resolved to prevent "flicker"
+        if (this.welcomeBanner) this.welcomeBanner.classList.add('hidden');
+        if (this.mainNav) this.mainNav.innerHTML = '';
+
+        // this.loadCurrentUser(); // Handled by Auth.init
+        this.setupNavigation(); // Will only setup if defaults are needed, but Auth will override
         this.populateFilters();
 
         // Initialize Auth Listener to update UI when ready
@@ -383,7 +388,10 @@ const App = {
         // Note: `ui-avatars` doesn't support gender. We can use `dicebear`.
         // Example: https://api.dicebear.com/7.x/avataaars/svg?seed=...&gender=...
         // Let's use a nice style "open-peeps" or "avataaars".
-        avatarUrl = `https://api.dicebear.com/7.x/notionists/svg?seed=${encodeURIComponent(job.institution)}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+        // Let's use `dicebear` with a style that matches the new palette (Green/Blue)
+        // seed based on institution (person name now)
+        avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(job.institution)}&backgroundColor=004aad,10b981&textColor=ffffff`;
+
 
         const isAuthenticated = this.isAuthenticated();
 

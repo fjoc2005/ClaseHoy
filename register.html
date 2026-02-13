@@ -1,158 +1,58 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - ClaseHoy</title>
     <link rel="stylesheet" href="assets/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
 </head>
-
 <body>
 
-    <div class="container">
-        <h2>Registro de Profesor</h2>
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Crear Cuenta</h2>
 
-        <div id="error-message" class="hidden" style="color:red; margin-bottom:15px;"></div>
+        <div id="error-message" class="hidden" style="color:red;"></div>
 
         <form id="register-form">
-
             <input type="text" name="nombre" placeholder="Nombre completo" required>
-
             <input type="email" name="email" placeholder="Correo electrónico" required>
-
-            <input type="password" name="password" placeholder="Contraseña" required>
-
-            <input type="text" name="telefono" placeholder="Teléfono (sin +569)" required>
-
-            <select id="region" name="region" required>
-                <option value="">Seleccionar región...</option>
-            </select>
-
-            <select id="comuna" name="comuna" disabled required>
-                <option value="">Seleccionar comuna...</option>
-            </select>
-
-            <select id="subjects" name="subjects" required>
-                <option value="">Seleccionar asignatura...</option>
-            </select>
-
-            <select name="experience" required>
-                <option value="">Años de experiencia...</option>
-                <option value="0-1">0-1 años</option>
-                <option value="2-5">2-5 años</option>
-                <option value="6-10">6-10 años</option>
-                <option value="10+">Más de 10 años</option>
-            </select>
-
-            <select name="availability" required>
-                <option value="">Disponibilidad...</option>
-                <option value="mañana">Mañana</option>
-                <option value="tarde">Tarde</option>
-                <option value="ambos">Ambos</option>
-            </select>
-
-            <select name="workload" required>
-                <option value="">Carga horaria...</option>
-                <option value="part-time">Part time</option>
-                <option value="full-time">Full time</option>
-            </select>
-
-            <textarea name="bio" placeholder="Breve descripción profesional" required></textarea>
-
+            <input type="password" name="password" placeholder="Contraseña (mínimo 6 caracteres)" required>
             <button type="submit">Registrarme</button>
-
         </form>
+
+        <p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p>
     </div>
+</div>
 
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="assets/js/firebase-config.js"></script>
-    <script src="assets/js/chile-data.js"></script>
-    <script src="assets/js/auth.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/auth.js"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
+<script>
+document.getElementById('register-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-            const regionSelect = document.getElementById('region');
-            const comunaSelect = document.getElementById('comuna');
-            const subjectsSelect = document.getElementById('subjects');
+    const errorDiv = document.getElementById('error-message');
+    errorDiv.classList.add('hidden');
 
-            if (!regionSelect || !comunaSelect || !subjectsSelect) {
-                console.error("Elementos del formulario no encontrados.");
-                return;
-            }
+    const formData = new FormData(e.target);
+    const nombre = formData.get('nombre');
+    const email = formData.get('email');
+    const password = formData.get('password');
 
-            ChileData.regions.forEach(region => {
-                const option = document.createElement('option');
-                option.value = region.id;
-                option.textContent = region.nombre;
-                regionSelect.appendChild(option);
-            });
+    const result = await Auth.register(email, password, { nombre });
 
-            ChileData.subjects.forEach(subject => {
-                const option = document.createElement('option');
-                option.value = subject;
-                option.textContent = subject;
-                subjectsSelect.appendChild(option);
-            });
-
-            regionSelect.addEventListener('change', (e) => {
-                const regionId = e.target.value;
-                comunaSelect.disabled = !regionId;
-                comunaSelect.innerHTML = '<option value="">Seleccionar comuna...</option>';
-
-                if (regionId) {
-                    const comunas = ChileData.getComunasByRegion(regionId);
-                    comunas.forEach(comuna => {
-                        const option = document.createElement('option');
-                        option.value = comuna;
-                        option.textContent = comuna;
-                        comunaSelect.appendChild(option);
-                    });
-                }
-            });
-
-            document.getElementById('register-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                const errorDiv = document.getElementById('error-message');
-                errorDiv.classList.add('hidden');
-
-                const formData = new FormData(e.target);
-
-                const email = formData.get('email');
-                const password = formData.get('password');
-
-                const extraData = {
-                    nombre: formData.get('nombre'),
-                    telefono: "+569" + formData.get('telefono'),
-                    region: regionSelect.options[regionSelect.selectedIndex].text,
-                    comuna: formData.get('comuna'),
-                    subjects: [formData.get('subjects')],
-                    experience: formData.get('experience'),
-                    availability: formData.get('availability'),
-                    workload: formData.get('workload'),
-                    bio: formData.get('bio')
-                };
-
-                const result = await Auth.register(email, password, extraData);
-
-                if (result.success) {
-                    window.location.href = '/';
-                } else {
-                    errorDiv.textContent = result.error;
-                    errorDiv.classList.remove('hidden');
-                }
-            });
-
-        });
-    </script>
+    if (result.success) {
+        window.location.href = "post-job.html";
+    } else {
+        errorDiv.textContent = result.error;
+        errorDiv.classList.remove('hidden');
+    }
+});
+</script>
 
 </body>
-
 </html>

@@ -7,7 +7,6 @@ const Auth = {
   currentUser: null,
 
   async init() {
-    // 🔒 Persistencia fuerte (importante en Vercel / producción)
     try {
       await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     } catch (e) {
@@ -16,7 +15,6 @@ const Auth = {
 
     firebase.auth().onAuthStateChanged(async (user) => {
       if (!user) {
-        // Usuario NO autenticado
         this.currentUser = null;
 
         if (window.App && App.onAuthChange) {
@@ -25,15 +23,12 @@ const Auth = {
         return;
       }
 
-      // ✅ Usuario autenticado (base)
       this.currentUser = user;
 
-      // 🔔 Notificar inmediatamente (desbloquea menú / publicar)
       if (window.App && App.onAuthChange) {
         App.onAuthChange(this.currentUser);
       }
 
-      // 🧩 Enriquecer con perfil Firestore (NO bloqueante)
       try {
         const doc = await db.collection('users').doc(user.uid).get();
         if (doc.exists) {
@@ -43,14 +38,12 @@ const Auth = {
             ...doc.data()
           };
 
-          // 🔔 Notificar nuevamente con perfil completo
           if (window.App && App.onAuthChange) {
             App.onAuthChange(this.currentUser);
           }
         }
       } catch (error) {
         console.warn('Perfil Firestore no cargado:', error);
-        // ⚠️ Aun así el usuario sigue logueado
       }
     });
   },
@@ -72,6 +65,36 @@ const Auth = {
       if (error.code === 'auth/user-not-found') msg = 'Usuario no encontrado';
       if (error.code === 'auth/wrong-password') msg = 'Contraseña incorrecta';
       if (error.code === 'auth/invalid-email') msg = 'Email inválido';
+      return { success: false, error: msg };
+    }
+  },
+
+  // ✅ FUNCIÓN REGISTER AGREGADA
+  async register(email, password, extraData = {}) {
+    try {
+      const userCredential = await firebase
+        .auth()
+        .createUserWithEmailAndPassword(email, password);
+
+      const user = userCredential.user;
+
+      // Guardar perfil en Firestore
+      await db.collection('users').doc(user.uid).set({
+        email: user.email,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        ...extraData
+      });
+
+      return { success: true };
+    } catch (error) {
+      let msg = 'Error al registrarse';
+      if (error.code === 'auth/email-already-in-use')
+        msg = 'El email ya está registrado';
+      if (error.code === 'auth/invalid-email')
+        msg = 'Email inválido';
+      if (error.code === 'auth/weak-password')
+        msg = 'La contraseña debe tener al menos 6 caracteres';
+
       return { success: false, error: msg };
     }
   },

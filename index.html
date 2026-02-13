@@ -63,11 +63,23 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    // 🔹 Cargar avisos activos
-    const now = firebase.firestore.Timestamp.now();
+    // 🔹 Función para calcular tiempo restante
+    function getTimeRemaining(expiresAt) {
+        const now = new Date();
+        const expireDate = expiresAt.toDate();
+        const diff = expireDate - now;
 
+        if (diff <= 0) return "Expirando...";
+
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+        return `Expira en: ${hours}h ${minutes}m`;
+    }
+
+    // 🔹 Cargar avisos activos
     db.collection("posts")
-      .where("expiresAt", ">", now)
+      .where("expiresAt", ">", firebase.firestore.Timestamp.now())
       .orderBy("expiresAt")
       .onSnapshot(snapshot => {
 
@@ -91,10 +103,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 <p><strong>${post.profesion}</strong></p>
                 <p>${post.region} - ${post.comuna}</p>
                 <p>${post.disponibilidad}</p>
+                <p id="timer-${doc.id}" style="color:#c0392b; font-weight:bold;"></p>
                 <div id="contact-${doc.id}"></div>
             `;
 
             postsContainer.appendChild(postDiv);
+
+            // 🔹 Actualizar contador cada minuto
+            function updateTimer() {
+                const timerElement = document.getElementById(`timer-${doc.id}`);
+                if (timerElement) {
+                    timerElement.innerText = getTimeRemaining(post.expiresAt);
+                }
+            }
+
+            updateTimer();
+            setInterval(updateTimer, 60000);
 
             firebase.auth().onAuthStateChanged(user => {
                 const contactDiv = document.getElementById(`contact-${doc.id}`);

@@ -1,54 +1,131 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>ClaseHoy</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+<meta charset="UTF-8">
+<title>ClaseHoy</title>
+<link rel="stylesheet" href="assets/css/style.css">
 
-    <style>
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-        }
+<style>
 
-        .modal-content {
-            background: white;
-            padding: 20px;
-            width: 350px;
-            border-radius: 8px;
-        }
+/* ----------- ESTILO GLOBAL MODERNO ----------- */
 
-        .modal-content input,
-        .modal-content select {
-            width: 100%;
-            margin-bottom: 10px;
-            padding: 6px;
-        }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    margin: 0;
+    padding: 40px 20px;
+}
 
-        .modal-content button {
-            padding: 8px;
-            border: none;
-            cursor: pointer;
-        }
-    </style>
+.auth-card {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    max-width: 700px;
+    margin: auto;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    animation: fadeIn 0.6s ease;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+button {
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+/* ----------- CARDS DE AVISOS ----------- */
+
+.post-card {
+    background: #f8f9ff;
+    padding: 18px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    animation: slideUp 0.4s ease;
+}
+
+.post-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+.timer {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+/* ----------- MODAL ----------- */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(6px);
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    width: 360px;
+    border-radius: 14px;
+    animation: scaleIn 0.3s ease;
+}
+
+.modal-content input,
+.modal-content select {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+}
+
+/* ----------- ANIMACIONES ----------- */
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+</style>
 </head>
 <body>
 
-<div class="auth-container">
-    <div class="auth-card">
-        <h1>ClaseHoy</h1>
-        <p>Profesores disponibles para reemplazos inmediatos</p>
+<div class="auth-card">
+    <h1>ClaseHoy</h1>
+    <p>Profesores disponibles para reemplazos inmediatos</p>
 
-        <div id="nav-buttons" style="margin:15px 0;"></div>
-        <div id="posts-container"></div>
-    </div>
+    <div id="nav-buttons" style="margin:15px 0;"></div>
+    <div id="posts-container"></div>
 </div>
 
-<!-- 🔵 MODAL EDITAR -->
+<!-- MODAL -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3>Editar Aviso</h3>
@@ -104,13 +181,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (user) {
             navButtons.innerHTML = `
-                <button onclick="window.location.href='post-job.html'">Publicar Aviso</button>
-                <button onclick="logout()" style="margin-left:10px;">Cerrar sesión</button>
+                <button style="background:#667eea;color:white;" onclick="window.location.href='post-job.html'">Publicar Aviso</button>
+                <button style="background:#e74c3c;color:white;margin-left:10px;" onclick="logout()">Cerrar sesión</button>
             `;
         } else {
             navButtons.innerHTML = `
-                <button onclick="window.location.href='login.html'">Iniciar sesión</button>
-                <button onclick="window.location.href='register.html'" style="margin-left:10px;">Registrarse</button>
+                <button style="background:#667eea;color:white;" onclick="window.location.href='login.html'">Iniciar sesión</button>
+                <button style="background:#764ba2;color:white;margin-left:10px;" onclick="window.location.href='register.html'">Registrarse</button>
             `;
         }
     });
@@ -121,37 +198,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.openEdit = function(postId, post) {
         editingPostId = postId;
-
-        document.getElementById("editNombre").value = post.nombre;
-        document.getElementById("editProfesion").value = post.profesion;
-        document.getElementById("editRegion").value = post.region;
-        document.getElementById("editComuna").value = post.comuna;
-        document.getElementById("editDisponibilidad").value = post.disponibilidad;
-
-        document.getElementById("editModal").style.display = "flex";
+        editNombre.value = post.nombre;
+        editProfesion.value = post.profesion;
+        editRegion.value = post.region;
+        editComuna.value = post.comuna;
+        editDisponibilidad.value = post.disponibilidad;
+        editModal.style.display = "flex";
     };
 
     window.closeModal = function() {
-        document.getElementById("editModal").style.display = "none";
+        editModal.style.display = "none";
     };
 
     window.saveEdit = async function() {
-
-        const updatedData = {
-            nombre: document.getElementById("editNombre").value,
-            profesion: document.getElementById("editProfesion").value,
-            region: document.getElementById("editRegion").value,
-            comuna: document.getElementById("editComuna").value,
-            disponibilidad: document.getElementById("editDisponibilidad").value
-        };
-
-        try {
-            await db.collection("posts").doc(editingPostId).update(updatedData);
-            closeModal();
-        } catch (error) {
-            alert("Error al guardar cambios");
-            console.error(error);
-        }
+        await db.collection("posts").doc(editingPostId).update({
+            nombre: editNombre.value,
+            profesion: editProfesion.value,
+            region: editRegion.value,
+            comuna: editComuna.value,
+            disponibilidad: editDisponibilidad.value
+        });
+        closeModal();
     };
 
     window.deletePost = async function(postId) {
@@ -162,9 +229,9 @@ document.addEventListener("DOMContentLoaded", () => {
     function getTimeRemaining(expiresAt) {
         const diff = expiresAt.toDate() - new Date();
         if (diff <= 0) return "Expirando...";
-        const hours = Math.floor(diff / (1000*60*60));
-        const minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
-        return `Expira en: ${hours}h ${minutes}m`;
+        const h = Math.floor(diff / (1000*60*60));
+        const m = Math.floor((diff % (1000*60*60)) / (1000*60));
+        return `Expira en: ${h}h ${m}m`;
     }
 
     db.collection("posts")
@@ -175,35 +242,30 @@ document.addEventListener("DOMContentLoaded", () => {
         postsContainer.innerHTML = "";
 
         snapshot.forEach(doc => {
-
             const post = doc.data();
 
             const div = document.createElement("div");
-            div.style.border = "1px solid #ddd";
-            div.style.padding = "10px";
-            div.style.marginBottom = "10px";
+            div.className = "post-card";
 
             div.innerHTML = `
                 <h3>${post.nombre}</h3>
                 <p><strong>${post.profesion}</strong></p>
                 <p>${post.region} - ${post.comuna}</p>
                 <p>${post.disponibilidad}</p>
-                <p style="color:#c0392b;font-weight:bold;">${getTimeRemaining(post.expiresAt)}</p>
+                <p class="timer">${getTimeRemaining(post.expiresAt)}</p>
                 ${currentUser ? `<p><strong>Contacto:</strong> ${post.email}</p>` : `<p style="color:gray;">Inicia sesión para ver contacto</p>`}
-                <div id="actions-${doc.id}"></div>
+                <div id="actions-${doc.id}" style="margin-top:10px;"></div>
             `;
 
             postsContainer.appendChild(div);
 
             if (currentUser && currentUser.uid === post.userId) {
                 document.getElementById(`actions-${doc.id}`).innerHTML = `
-                    <button onclick='openEdit("${doc.id}", ${JSON.stringify(post)})' style="background:#f39c12;color:white;margin-right:5px;">Editar</button>
-                    <button onclick='deletePost("${doc.id}")' style="background:#e74c3c;color:white;">Eliminar</button>
+                    <button style="background:#f39c12;color:white;margin-right:5px;" onclick='openEdit("${doc.id}", ${JSON.stringify(post)})'>Editar</button>
+                    <button style="background:#e74c3c;color:white;" onclick='deletePost("${doc.id}")'>Eliminar</button>
                 `;
             }
-
         });
-
     });
 
 });

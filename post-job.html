@@ -9,120 +9,184 @@
 
 <div class="auth-container">
     <div class="auth-card">
-        <h2>Publicar Aviso de Disponibilidad</h2>
+        <h2>Publicar Aviso</h2>
 
-        <div id="message" style="margin-bottom:10px;"></div>
+        <form id="postForm">
 
-        <form id="post-form">
-            <input type="text" name="profesion" placeholder="Profesión (Ej: Profesor de Matemática)" required>
+            <input type="text" id="nombre" placeholder="Nombre completo" required>
 
-            <input type="text" name="region" placeholder="Región" required>
-
-            <input type="text" name="comuna" placeholder="Comuna" required>
-
-            <select name="disponibilidad" required>
-                <option value="">Seleccionar disponibilidad</option>
-                <option value="Inmediata">Disponibilidad inmediata</option>
-                <option value="Completando horario">Completando horario</option>
+            <!-- PROFESION -->
+            <select id="profesion" required>
+                <option value="">Seleccione profesión</option>
+                <option>Profesor/a de Lenguaje</option>
+                <option>Profesor/a de Matemática</option>
+                <option>Profesor/a de Historia</option>
+                <option>Profesor/a de Ciencias Naturales</option>
+                <option>Profesor/a de Biología</option>
+                <option>Profesor/a de Química</option>
+                <option>Profesor/a de Física</option>
+                <option>Profesor/a de Inglés</option>
+                <option>Profesor/a de Educación Física</option>
+                <option>Profesor/a de Música</option>
+                <option>Profesor/a de Artes Visuales</option>
+                <option>Profesor/a de Tecnología</option>
+                <option>Educadora Diferencial</option>
+                <option>Educadora de Párvulos</option>
+                <option>Profesor/a Básica General</option>
             </select>
 
-            <button type="submit">Publicar Aviso (24 horas)</button>
+            <!-- REGION -->
+            <select id="region" required>
+                <option value="">Seleccione Región</option>
+                <option>Arica y Parinacota</option>
+                <option>Tarapacá</option>
+                <option>Antofagasta</option>
+                <option>Atacama</option>
+                <option>Coquimbo</option>
+                <option>Valparaíso</option>
+                <option>Metropolitana</option>
+                <option>O'Higgins</option>
+                <option>Maule</option>
+                <option>Ñuble</option>
+                <option>Biobío</option>
+                <option>La Araucanía</option>
+                <option>Los Ríos</option>
+                <option>Los Lagos</option>
+                <option>Aysén</option>
+                <option>Magallanes</option>
+            </select>
+
+            <!-- COMUNA -->
+            <select id="comuna" required>
+                <option value="">Seleccione Comuna</option>
+            </select>
+
+            <!-- DISPONIBILIDAD -->
+            <select id="disponibilidad" required>
+                <option value="">Disponibilidad</option>
+                <option>Disponible inmediato</option>
+                <option>Completando horario</option>
+            </select>
+
+            <button type="submit">Publicar Aviso</button>
+
         </form>
 
-        <br>
-        <button id="logout-btn">Cerrar sesión</button>
+        <p id="message"></p>
     </div>
 </div>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="assets/js/firebase-config.js"></script>
-<script src="assets/js/auth.js"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", async () => {
 
-    const user = firebase.auth().currentUser;
+document.addEventListener("DOMContentLoaded", () => {
 
-    firebase.auth().onAuthStateChanged((user) => {
-        if (!user) {
-            window.location.href = "login.html";
+    const form = document.getElementById("postForm");
+    const message = document.getElementById("message");
+
+    const regionSelect = document.getElementById("region");
+    const comunaSelect = document.getElementById("comuna");
+
+    // 🔹 Comunas simplificadas (puedo ampliarlas completas después)
+    const comunasPorRegion = {
+        "Metropolitana": ["Santiago","Providencia","Las Condes","Maipú","Puente Alto","Ñuñoa"],
+        "Valparaíso": ["Valparaíso","Viña del Mar","Quilpué","Villa Alemana","San Antonio"],
+        "Biobío": ["Concepción","Talcahuano","Los Ángeles","Chillán"],
+        "La Araucanía": ["Temuco","Villarrica","Angol"],
+        "Los Lagos": ["Puerto Montt","Osorno","Castro"],
+        "Antofagasta": ["Antofagasta","Calama"],
+        "Coquimbo": ["La Serena","Coquimbo"],
+        "Maule": ["Talca","Curicó"],
+        "O'Higgins": ["Rancagua","San Fernando"],
+        "Atacama": ["Copiapó","Vallenar"],
+        "Tarapacá": ["Iquique"],
+        "Arica y Parinacota": ["Arica"],
+        "Ñuble": ["Chillán"],
+        "Los Ríos": ["Valdivia"],
+        "Aysén": ["Coyhaique"],
+        "Magallanes": ["Punta Arenas"]
+    };
+
+    regionSelect.addEventListener("change", () => {
+        const region = regionSelect.value;
+        comunaSelect.innerHTML = '<option value="">Seleccione Comuna</option>';
+
+        if (comunasPorRegion[region]) {
+            comunasPorRegion[region].forEach(comuna => {
+                const option = document.createElement("option");
+                option.value = comuna;
+                option.textContent = comuna;
+                comunaSelect.appendChild(option);
+            });
         }
     });
 
-    const form = document.getElementById("post-form");
-    const messageDiv = document.getElementById("message");
+    firebase.auth().onAuthStateChanged(user => {
 
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const currentUser = firebase.auth().currentUser;
-
-        if (!currentUser) {
+        if (!user) {
             window.location.href = "login.html";
             return;
         }
 
-        messageDiv.innerHTML = "Publicando...";
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-        const formData = new FormData(form);
+            const nombre = document.getElementById("nombre").value;
+            const profesion = document.getElementById("profesion").value;
+            const region = regionSelect.value;
+            const comuna = comunaSelect.value;
+            const disponibilidad = document.getElementById("disponibilidad").value;
 
-        const profesion = formData.get("profesion");
-        const region = formData.get("region");
-        const comuna = formData.get("comuna");
-        const disponibilidad = formData.get("disponibilidad");
+            const now = new Date();
+            const expires = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
-        const now = firebase.firestore.Timestamp.now();
-        const expiresAt = new firebase.firestore.Timestamp(
-            now.seconds + (24 * 60 * 60),
-            now.nanoseconds
-        );
+            try {
 
-        try {
+                // 🔹 Verificar si ya tiene aviso activo
+                const existing = await db.collection("posts")
+                    .where("userId","==",user.uid)
+                    .where("expiresAt",">",firebase.firestore.Timestamp.now())
+                    .get();
 
-            // Eliminar aviso anterior del usuario
-            const existing = await db.collection("posts")
-                .where("userId", "==", currentUser.uid)
-                .get();
+                if (!existing.empty) {
+                    message.style.color = "red";
+                    message.innerText = "Ya tienes un aviso activo.";
+                    return;
+                }
 
-            existing.forEach(doc => {
-                doc.ref.delete();
-            });
+                await db.collection("posts").add({
+                    userId: user.uid,
+                    nombre,
+                    profesion,
+                    region,
+                    comuna,
+                    disponibilidad,
+                    email: user.email,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: firebase.firestore.Timestamp.fromDate(expires)
+                });
 
-            // Obtener nombre del usuario
-            const userDoc = await db.collection("users").doc(currentUser.uid).get();
-            const nombre = userDoc.data().nombre;
+                message.style.color = "green";
+                message.innerText = "Tu aviso ha sido publicado.";
 
-            // Crear nuevo aviso
-            await db.collection("posts").add({
-                nombre: nombre,
-                profesion: profesion,
-                region: region,
-                comuna: comuna,
-                disponibilidad: disponibilidad,
-                email: currentUser.email,
-                userId: currentUser.uid,
-                createdAt: now,
-                expiresAt: expiresAt
-            });
+                form.reset();
 
-            messageDiv.innerHTML = "✅ Aviso publicado correctamente (activo 24 horas)";
-            form.reset();
+            } catch (error) {
+                message.style.color = "red";
+                message.innerText = "Error al publicar aviso.";
+                console.error(error);
+            }
 
-        } catch (error) {
-            console.error(error);
-            messageDiv.innerHTML = "❌ Error al publicar aviso";
-        }
-    });
+        });
 
-    document.getElementById("logout-btn").addEventListener("click", async () => {
-        await firebase.auth().signOut();
-        window.location.href = "index.html";
     });
 
 });
+
 </script>
 
 </body>

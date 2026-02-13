@@ -4,6 +4,37 @@
     <meta charset="UTF-8">
     <title>ClaseHoy</title>
     <link rel="stylesheet" href="assets/css/style.css">
+
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            width: 350px;
+            border-radius: 8px;
+        }
+
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 6px;
+        }
+
+        .modal-content button {
+            padding: 8px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
@@ -13,10 +44,43 @@
         <p>Profesores disponibles para reemplazos inmediatos</p>
 
         <div id="nav-buttons" style="margin:15px 0;"></div>
-
-        <br>
-
         <div id="posts-container"></div>
+    </div>
+</div>
+
+<!-- 🔵 MODAL EDITAR -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <h3>Editar Aviso</h3>
+
+        <input type="text" id="editNombre">
+
+        <select id="editProfesion">
+            <option>Lenguaje</option>
+            <option>Matemática</option>
+            <option>Historia</option>
+            <option>Ciencias Naturales</option>
+            <option>Física</option>
+            <option>Química</option>
+            <option>Biología</option>
+            <option>Inglés</option>
+            <option>Educación Física</option>
+            <option>Artes</option>
+            <option>Música</option>
+            <option>Educación Diferencial</option>
+            <option>Educación Parvularia</option>
+        </select>
+
+        <input type="text" id="editRegion">
+        <input type="text" id="editComuna">
+
+        <select id="editDisponibilidad">
+            <option>Disponibilidad inmediata</option>
+            <option>Completando horario</option>
+        </select>
+
+        <button onclick="saveEdit()" style="background:#27ae60;color:white;">Guardar</button>
+        <button onclick="closeModal()" style="background:#7f8c8d;color:white;margin-left:5px;">Cancelar</button>
     </div>
 </div>
 
@@ -33,93 +97,73 @@ document.addEventListener("DOMContentLoaded", () => {
     const navButtons = document.getElementById("nav-buttons");
 
     let currentUser = null;
+    let editingPostId = null;
 
     firebase.auth().onAuthStateChanged(user => {
-
         currentUser = user;
 
         if (user) {
             navButtons.innerHTML = `
-                <button onclick="window.location.href='post-job.html'">
-                    Publicar Aviso
-                </button>
-                <button onclick="logout()" style="margin-left:10px;">
-                    Cerrar sesión
-                </button>
+                <button onclick="window.location.href='post-job.html'">Publicar Aviso</button>
+                <button onclick="logout()" style="margin-left:10px;">Cerrar sesión</button>
             `;
         } else {
             navButtons.innerHTML = `
-                <button onclick="window.location.href='login.html'">
-                    Iniciar sesión
-                </button>
-                <button onclick="window.location.href='register.html'" style="margin-left:10px;">
-                    Registrarse
-                </button>
+                <button onclick="window.location.href='login.html'">Iniciar sesión</button>
+                <button onclick="window.location.href='register.html'" style="margin-left:10px;">Registrarse</button>
             `;
         }
-
     });
 
     window.logout = function() {
-        firebase.auth().signOut().then(() => {
-            window.location.reload();
-        });
+        firebase.auth().signOut().then(() => location.reload());
     };
 
-    // 🔴 ELIMINAR
+    window.openEdit = function(postId, post) {
+        editingPostId = postId;
+
+        document.getElementById("editNombre").value = post.nombre;
+        document.getElementById("editProfesion").value = post.profesion;
+        document.getElementById("editRegion").value = post.region;
+        document.getElementById("editComuna").value = post.comuna;
+        document.getElementById("editDisponibilidad").value = post.disponibilidad;
+
+        document.getElementById("editModal").style.display = "flex";
+    };
+
+    window.closeModal = function() {
+        document.getElementById("editModal").style.display = "none";
+    };
+
+    window.saveEdit = async function() {
+
+        const updatedData = {
+            nombre: document.getElementById("editNombre").value,
+            profesion: document.getElementById("editProfesion").value,
+            region: document.getElementById("editRegion").value,
+            comuna: document.getElementById("editComuna").value,
+            disponibilidad: document.getElementById("editDisponibilidad").value
+        };
+
+        try {
+            await db.collection("posts").doc(editingPostId).update(updatedData);
+            closeModal();
+        } catch (error) {
+            alert("Error al guardar cambios");
+            console.error(error);
+        }
+    };
+
     window.deletePost = async function(postId) {
-        if (!confirm("¿Seguro que deseas eliminar tu aviso?")) return;
-
-        try {
-            await db.collection("posts").doc(postId).delete();
-        } catch (error) {
-            alert("Error al eliminar aviso.");
-            console.error(error);
-        }
-    };
-
-    // 🟡 EDITAR
-    window.editPost = async function(postId, postData) {
-
-        const nuevoNombre = prompt("Editar nombre:", postData.nombre);
-        if (!nuevoNombre) return;
-
-        const nuevaProfesion = prompt("Editar profesión:", postData.profesion);
-        if (!nuevaProfesion) return;
-
-        const nuevaRegion = prompt("Editar región:", postData.region);
-        if (!nuevaRegion) return;
-
-        const nuevaComuna = prompt("Editar comuna:", postData.comuna);
-        if (!nuevaComuna) return;
-
-        const nuevaDisponibilidad = prompt("Editar disponibilidad:", postData.disponibilidad);
-        if (!nuevaDisponibilidad) return;
-
-        try {
-            await db.collection("posts").doc(postId).update({
-                nombre: nuevoNombre,
-                profesion: nuevaProfesion,
-                region: nuevaRegion,
-                comuna: nuevaComuna,
-                disponibilidad: nuevaDisponibilidad
-            });
-        } catch (error) {
-            alert("Error al editar aviso.");
-            console.error(error);
-        }
+        if (!confirm("¿Eliminar aviso?")) return;
+        await db.collection("posts").doc(postId).delete();
     };
 
     function getTimeRemaining(expiresAt) {
-        const now = new Date();
-        const expireDate = expiresAt.toDate();
-        const diff = expireDate - now;
-
+        const diff = expiresAt.toDate() - new Date();
         if (diff <= 0) return "Expirando...";
-
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
+        const hours = Math.floor(diff / (1000*60*60));
+        const minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
         return `Expira en: ${hours}h ${minutes}m`;
     }
 
@@ -130,64 +174,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
         postsContainer.innerHTML = "";
 
-        if (snapshot.empty) {
-            postsContainer.innerHTML = "<p>No hay avisos activos.</p>";
-            return;
-        }
-
         snapshot.forEach(doc => {
 
             const post = doc.data();
 
-            const postDiv = document.createElement("div");
-            postDiv.style.border = "1px solid #ddd";
-            postDiv.style.padding = "10px";
-            postDiv.style.marginBottom = "10px";
+            const div = document.createElement("div");
+            div.style.border = "1px solid #ddd";
+            div.style.padding = "10px";
+            div.style.marginBottom = "10px";
 
-            postDiv.innerHTML = `
+            div.innerHTML = `
                 <h3>${post.nombre}</h3>
                 <p><strong>${post.profesion}</strong></p>
                 <p>${post.region} - ${post.comuna}</p>
                 <p>${post.disponibilidad}</p>
-                <p id="timer-${doc.id}" style="color:#c0392b; font-weight:bold;"></p>
-                <div id="contact-${doc.id}"></div>
-                <div id="actions-${doc.id}" style="margin-top:10px;"></div>
+                <p style="color:#c0392b;font-weight:bold;">${getTimeRemaining(post.expiresAt)}</p>
+                ${currentUser ? `<p><strong>Contacto:</strong> ${post.email}</p>` : `<p style="color:gray;">Inicia sesión para ver contacto</p>`}
+                <div id="actions-${doc.id}"></div>
             `;
 
-            postsContainer.appendChild(postDiv);
+            postsContainer.appendChild(div);
 
-            function updateTimer() {
-                const timerElement = document.getElementById(`timer-${doc.id}`);
-                if (timerElement) {
-                    timerElement.innerText = getTimeRemaining(post.expiresAt);
-                }
-            }
-
-            updateTimer();
-            setInterval(updateTimer, 60000);
-
-            const contactDiv = document.getElementById(`contact-${doc.id}`);
-            if (currentUser) {
-                contactDiv.innerHTML = `
-                    <p><strong>Contacto:</strong> ${post.email}</p>
-                `;
-            } else {
-                contactDiv.innerHTML = `
-                    <p style="color:gray;">Inicia sesión para ver el contacto</p>
-                `;
-            }
-
-            const actionsDiv = document.getElementById(`actions-${doc.id}`);
             if (currentUser && currentUser.uid === post.userId) {
-                actionsDiv.innerHTML = `
-                    <button onclick='editPost("${doc.id}", ${JSON.stringify(post)})'
-                        style="margin-right:10px; background:#f39c12; color:white;">
-                        Editar
-                    </button>
-                    <button onclick='deletePost("${doc.id}")'
-                        style="background:#e74c3c; color:white;">
-                        Eliminar
-                    </button>
+                document.getElementById(`actions-${doc.id}`).innerHTML = `
+                    <button onclick='openEdit("${doc.id}", ${JSON.stringify(post)})' style="background:#f39c12;color:white;margin-right:5px;">Editar</button>
+                    <button onclick='deletePost("${doc.id}")' style="background:#e74c3c;color:white;">Eliminar</button>
                 `;
             }
 

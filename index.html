@@ -1,126 +1,85 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClaseHoy - Sala de Profes</title>
-    <link rel="stylesheet" href="assets/css/style.css?v=2.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>ClaseHoy</title>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
-
 <body>
-    <!-- Splash Screen Removed for Stability -->
 
-    <header>
-        <div class="container header-content">
-            <a href="index.html" class="logo" style="display: flex; align-items: center; gap: 0.5rem;">
-                <img src="assets/images/logo.png" alt="ClaseHoy" class="logo-img"
-                    style="width: 40px; height: 40px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));">
-                <span class="gradient-text">ClaseHoy</span>
-            </a>
-            <nav id="main-nav">
-                <!-- Populated by JS based on auth state -->
-            </nav>
-        </div>
-    </header>
+<div class="auth-container">
+    <div class="auth-card">
+        <h1>ClaseHoy</h1>
+        <p>Profesores disponibles para reemplazos inmediatos</p>
+        <br>
 
-    <!-- PWA Download Banner -->
-    <div id="pwa-banner" class="pwa-banner hidden">
-        <i class="fa-solid fa-mobile-screen-button"></i>
-        <span>¡Lleva ClaseHoy en tu bolsillo!</span>
-        <a href="#" class="pwa-btn"
-            onclick="alert('Para instalar: \nEn Chrome: Menú > Instalar Aplicación\nEn Safari: Compartir > Agregar a Inicio')">
-            <i class="fa-solid fa-download"></i> Descargar App
-        </a>
-        <button class="btn-text text-white" onclick="document.getElementById('pwa-banner').classList.add('hidden')"
-            style="margin-left: 1rem; font-size: 1.2rem;">&times;</button>
+        <div id="posts-container"></div>
     </div>
+</div>
 
-    <main class="container mt-4">
-        <!-- Welcome banner for non-authenticated users -->
-        <div id="welcome-banner" class="hidden card"
-            style="background: linear-gradient(135deg, #6366f1, #ec4899); color: white; border: none; margin-bottom: 2rem;">
-            <div class="text-center">
-                <h2 class="font-bold mb-2" style="font-size: 1.8rem;">¡Bienvenido a ClaseHoy!</h2>
-                <p class="mb-2" style="font-size: 1.1rem;">La plataforma que conecta a docentes con oportunidades de
-                    trabajo en tiempo real</p>
-                <p class="mb-4" style="font-size: 0.9rem; opacity: 0.9;">
-                    <i class="fa-solid fa-clock mr-2"></i>
-                    <strong>Avisos activos por 24 horas</strong> - Oportunidades frescas y relevantes cada día
-                </p>
-                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                    <a href="register.html" class="btn btn-white"
-                        style="background: white; color: var(--accent); font-weight: 800; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-                        <i class="fa-solid fa-user-plus mr-2"></i> CREAR PERFIL
-                    </a>
-                    <a href="login.html" class="btn"
-                        style="background: rgba(255,255,255,0.25); color: white; border: 1px solid white; backdrop-filter: blur(4px);">
-                        <i class="fa-solid fa-right-to-bracket mr-2"></i> INGRESAR
-                    </a>
-                </div>
-            </div>
-        </div>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
 
-        <div class="filters-container card">
-            <div class="flex-between mb-2">
-                <h2 class="font-bold"><i class="fa-solid fa-filter"></i> Filtros</h2>
-                <button class="btn-text text-sm" onclick="App.clearFilters()">Limpiar</button>
-            </div>
-            <div class="filter-grid">
-                <div class="input-group-compact">
-                    <select id="filter-region" onchange="App.applyFilters()">
-                        <option value="">Todas las Regiones</option>
-                        <!-- Populated by JS -->
-                    </select>
-                </div>
-                <div class="input-group-compact">
-                    <select id="filter-subject" onchange="App.applyFilters()">
-                        <option value="">Todas las Asignaturas</option>
-                        <!-- Populated by JS -->
-                    </select>
-                </div>
-                <div class="input-group-compact">
-                    <select id="filter-hours" onchange="App.applyFilters()">
-                        <option value="">Cualquier carga horaria</option>
-                        <option value="full">Jornada Completa</option>
-                        <option value="part">Media Jornada</option>
-                        <option value="block">Por Bloques</option>
-                    </select>
-                </div>
-            </div>
-        </div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
 
-        <div id="job-list" class="job-grid">
-            <!-- Cards injected here -->
-        </div>
+    const postsContainer = document.getElementById("posts-container");
 
-        <footer class="legal-footer">
-            <p>&copy; 2026 ClaseHoy. Todos los derechos reservados.</p>
-            <p>
-                <a href="#" onclick="App.openTermsModal()">Términos y Condiciones</a> |
-                <a href="mailto:contacto.clasehoy@gmail.com">Contacto</a>
-            </p>
-        </footer>
-    </main>
+    const now = firebase.firestore.Timestamp.now();
 
-    <!-- Firebase SDKs (Compat for Vanilla JS) -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="assets/js/firebase-config.js"></script>
+    db.collection("posts")
+      .where("expiresAt", ">", now)
+      .orderBy("expiresAt")
+      .onSnapshot(snapshot => {
 
-    <script src="assets/js/chile-data.js"></script>
-    <script src="assets/js/backend-service.js"></script>
-    <script src="assets/js/contact-service.js"></script>
-    <script src="assets/js/auth.js"></script>
-    <script src="assets/js/seed.js"></script>
-    <script src="assets/js/app.js"></script>
+        postsContainer.innerHTML = "";
+
+        if (snapshot.empty) {
+            postsContainer.innerHTML = "<p>No hay avisos activos.</p>";
+            return;
+        }
+
+        snapshot.forEach(doc => {
+            const post = doc.data();
+
+            const postDiv = document.createElement("div");
+            postDiv.style.border = "1px solid #ddd";
+            postDiv.style.padding = "10px";
+            postDiv.style.marginBottom = "10px";
+
+            postDiv.innerHTML = `
+                <h3>${post.nombre}</h3>
+                <p><strong>${post.profesion}</strong></p>
+                <p>${post.region} - ${post.comuna}</p>
+                <p>${post.disponibilidad}</p>
+                <div id="contact-${doc.id}"></div>
+            `;
+
+            postsContainer.appendChild(postDiv);
+
+            firebase.auth().onAuthStateChanged(user => {
+                const contactDiv = document.getElementById(`contact-${doc.id}`);
+
+                if (user) {
+                    contactDiv.innerHTML = `
+                        <p><strong>Contacto:</strong> ${post.email}</p>
+                    `;
+                } else {
+                    contactDiv.innerHTML = `
+                        <p style="color:gray;">Inicia sesión para ver el contacto</p>
+                    `;
+                }
+            });
+
+        });
+
+    });
+
+});
+</script>
+
 </body>
-
 </html>

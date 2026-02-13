@@ -15,9 +15,13 @@
         <div id="nav-buttons" style="margin:15px 0;"></div>
 
         <!-- 🔎 FILTROS -->
-        <div style="margin-bottom:20px;">
+        <div style="margin-bottom:20px; display: flex; gap: 0.5rem; flex-wrap: wrap;">
             <select id="filter-region">
                 <option value="">Todas las regiones</option>
+            </select>
+
+            <select id="filter-comuna" disabled>
+                <option value="">Todas las comunas</option>
             </select>
 
             <select id="filter-disponibilidad" style="margin-left:10px;">
@@ -38,34 +42,76 @@
 <script src="assets/js/firebase-config.js"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+// ─────────────────────────────────────────────────────────────────────────────
+// 🌎 Datos de Regiones y Comunas de Chile (extraídos del dataset oficial)
+// Puedes ampliar o actualizar esto en assets/js/chile-data.js si quieres reusarlo
+// ─────────────────────────────────────────────────────────────────────────────
+const ChileanRegions = [
+    {"region":"Región de Arica y Parinacota","comunas":["Arica","Camarones","Putre","General Lagos"]},
+    {"region":"Región de Tarapacá","comunas":["Iquique","Alto Hospicio","Pozo Almonte","Camiña","Colchane","Huara","Pica"]},
+    {"region":"Región de Antofagasta","comunas":["Antofagasta","Mejillones","Sierra Gorda","Taltal","Calama","Ollagüe","San Pedro de Atacama","Tocopilla","María Elena"]},
+    {"region":"Región de Atacama","comunas":["Copiapó","Caldera","Tierra Amarilla","Chañaral","Diego de Almagro","Vallenar","Alto del Carmen","Freirina","Huasco"]},
+    {"region":"Región de Coquimbo","comunas":["La Serena","Coquimbo","Andacollo","La Higuera","Vicuña","Illapel","Canela","Los Vilos","Salamanca","Ovalle","Combarbalá","Punitaqui","Río Hurtado"]},
+    {"region":"Región de Valparaíso","comunas":["Valparaíso","Casablanca","Concón","Juan Fernández","Puchuncaví","Quintero","Viña del Mar","Isla de Pascua","Los Andes","Calle Larga","Rinconada","San Esteban","La Ligua","Cabildo","Papudo","Petorca","Zapallar","Quillota","Calera","Hijuelas","La Cruz","Nogales","San Antonio","Algarrobo","Cartagena","El Tabo","El Quisco","Santo Domingo","San Felipe","Catemu","Llaillay","Panquehue","Putaendo","Santa María"]},
+    {"region":"Región Metropolitana de Santiago","comunas":["Cerrillos","Cerro Navia","Conchalí","El Bosque","Estación Central","Huechuraba","Independencia","La Cisterna","La Florida","La Granja","La Pintana","La Reina","Las Condes","Lo Barnechea","Lo Espejo","Lo Prado","Macul","Maipú","Ñuñoa","Pedro Aguirre Cerda","Peñalolén","Providencia","Pudahuel","Quilicura","Quinta Normal","Recoleta","Renca","San Joaquín","San Miguel","San Ramón","Santiago","Vitacura"]},
+    {"region":"Región del Libertador General Bernardo O’Higgins","comunas":["Rancagua","Codegua","Coinco","Coltauco","Doñihue","Graneros","Las Cabras","Machalí","Malloa","Mostazal","Olivar","Peumo","Pichidegua","Quinta de Tilcoco","Rengo","Requínoa","San Vicente","Pichilemu","La Estrella","Litueche","Marchihue","Navidad","Peredones"]},
+    {"region":"Región del Maule","comunas":["Talca","Cauquenes","Chanco","Constitución","Curicó","Empedrado","Hualañé","Licantén","Maule","Pelarco","Pencahue","Río Claro","San Clemente","San Rafael","Cauquenes"]},
+    {"region":"Región de Ñuble","comunas":["Chillán","Chillán Viejo","Bulnes","Cobquecura","Coelemu","El Carmen","Ninhue","Portezuelo","Quillón","Ránquil","San Carlos","San Fabián","San Ignacio","Treguaco","Yungay"]},
+    {"region":"Región del Biobío","comunas":["Concepción","Coronel","Chiguayante","Florida","Hualpén","Hualqui","Lota","Penco","San Pedro de la Paz","Santa Juana","Talcahuano","Tomé","Yumbel","Antuco","Cañete","Los Álamos","Lebu","Arauco","Curanilahue","Tirúa"]},
+    {"region":"Región de La Araucanía","comunas":["Temuco","Carahue","Cunco","Curarrehue","Freire","Galvarino","Gorbea","Lautaro","Loncoche","Melipeuco","Nueva Imperial","Padre Las Casas","Pitrufquén","Pucón","Saavedra","Teodoro Schmidt","Toltén","Villarrica"]},
+    {"region":"Región de Los Ríos","comunas":["Valdivia","Corral","Lanco","Los Lagos","Mariquina","Paillaco","Panguipulli"]},
+    {"region":"Región de Los Lagos","comunas":["Puerto Montt","Castro","Ancud","Osorno","Quellón","Calbuco","Chaitén","Fresia","Frutillar","Llanquihue","Maullín","Osorno","Palena"]},
+    {"region":"Región de Aysén del General Carlos Ibáñez del Campo","comunas":["Coihaique","Aisén","Cisnes","Guaitecas","Chile Chico","O’Higgins"]},
+    {"region":"Región de Magallanes y de la Antártica Chilena","comunas":["Punta Arenas","Puerto Natales","Porvenir","Timaukel","Cabo de Hornos"]}
+];
 
+document.addEventListener("DOMContentLoaded", () => {
     const postsContainer = document.getElementById("posts-container");
     const navButtons = document.getElementById("nav-buttons");
     const filterRegion = document.getElementById("filter-region");
+    const filterComuna = document.getElementById("filter-comuna");
     const filterDisponibilidad = document.getElementById("filter-disponibilidad");
 
     let allPosts = [];
 
-    // 🔹 Mostrar botones según sesión
+    // ── POBLAR SELECTS DE REGIONES/COMUNAS ─────────────────────────────────────
+    ChileanRegions.forEach(reg => {
+        filterRegion.innerHTML += `<option value="${reg.region}">${reg.region}</option>`;
+    });
+
+    filterRegion.addEventListener("change", () => {
+        filterComuna.innerHTML = `<option value="">Todas las comunas</option>`;
+        filterComuna.disabled = false;
+
+        const region = filterRegion.value;
+        const regionData = ChileanRegions.find(r => r.region === region);
+
+        if (regionData) {
+            regionData.comunas.forEach(c => {
+                filterComuna.innerHTML += `<option value="${c}">${c}</option>`;
+            });
+        }
+        renderPosts();
+    });
+
+    filterComuna.addEventListener("change", renderPosts);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // El resto del código (botones, firestore y renderizado) queda igual
+    // pero dentro de las funciones renderPosts y onSnapshot
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // Mostrar sesión
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
             navButtons.innerHTML = `
-                <button onclick="window.location.href='post-job.html'">
-                    Publicar Aviso
-                </button>
-                <button onclick="logout()" style="margin-left:10px;">
-                    Cerrar sesión
-                </button>
+                <button onclick="window.location.href='post-job.html'">Publicar Aviso</button>
+                <button onclick="logout()" style="margin-left:10px;">Cerrar sesión</button>
             `;
         } else {
             navButtons.innerHTML = `
-                <button onclick="window.location.href='login.html'">
-                    Iniciar sesión
-                </button>
-                <button onclick="window.location.href='register.html'" style="margin-left:10px;">
-                    Registrarse
-                </button>
+                <button onclick="window.location.href='login.html'">Iniciar sesión</button>
+                <button onclick="window.location.href='register.html'" style="margin-left:10px;">Registrarse</button>
             `;
         }
     });
@@ -76,32 +122,28 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    // 🔹 Función contador
     function getTimeRemaining(expiresAt) {
         const now = new Date();
         const expireDate = expiresAt.toDate();
         const diff = expireDate - now;
-
         if (diff <= 0) return "Expirando...";
-
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
         return `Expira en: ${hours}h ${minutes}m`;
     }
 
-    // 🔹 Renderizar avisos
     function renderPosts() {
-
         postsContainer.innerHTML = "";
 
         const selectedRegion = filterRegion.value;
-        const selectedDisponibilidad = filterDisponibilidad.value;
+        const selectedComuna = filterComuna.value;
+        const selectedDisp = filterDisponibilidad.value;
 
         const filtered = allPosts.filter(post => {
             const regionMatch = selectedRegion === "" || post.region === selectedRegion;
-            const disponibilidadMatch = selectedDisponibilidad === "" || post.disponibilidad === selectedDisponibilidad;
-            return regionMatch && disponibilidadMatch;
+            const comunaMatch = selectedComuna === "" || post.comuna === selectedComuna;
+            const dispMatch = selectedDisp === "" || post.disponibilidad === selectedDisp;
+            return regionMatch && comunaMatch && dispMatch;
         });
 
         if (filtered.length === 0) {
@@ -110,9 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         filtered.forEach(post => {
-
             const postDiv = document.createElement("div");
-
             postDiv.innerHTML = `
                 <h3>${post.nombre}</h3>
                 <p><strong>${post.profesion}</strong></p>
@@ -121,7 +161,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 <p id="timer-${post.id}"></p>
                 <div id="contact-${post.id}"></div>
             `;
-
             postsContainer.appendChild(postDiv);
 
             function updateTimer() {
@@ -130,54 +169,32 @@ document.addEventListener("DOMContentLoaded", () => {
                     timerElement.innerText = getTimeRemaining(post.expiresAt);
                 }
             }
-
             updateTimer();
             setInterval(updateTimer, 60000);
 
             firebase.auth().onAuthStateChanged(user => {
                 const contactDiv = document.getElementById(`contact-${post.id}`);
-
                 if (user) {
-                    contactDiv.innerHTML = `
-                        <p><strong>Contacto:</strong> ${post.email}</p>
-                    `;
+                    contactDiv.innerHTML = `<p><strong>Contacto:</strong> ${post.email}</p>`;
                 } else {
-                    contactDiv.innerHTML = `
-                        <p style="color:gray;">Inicia sesión para ver el contacto</p>
-                    `;
+                    contactDiv.innerHTML = `<p style="color:gray;">Inicia sesión para ver el contacto</p>`;
                 }
             });
-
         });
     }
 
-    // 🔹 Cargar avisos
     db.collection("posts")
       .where("expiresAt", ">", firebase.firestore.Timestamp.now())
       .orderBy("expiresAt")
       .onSnapshot(snapshot => {
-
         allPosts = [];
-        const regionsSet = new Set();
-
         snapshot.forEach(doc => {
             const data = doc.data();
             data.id = doc.id;
             allPosts.push(data);
-            regionsSet.add(data.region);
         });
-
-        // Cargar regiones únicas en el filtro
-        filterRegion.innerHTML = `<option value="">Todas las regiones</option>`;
-        regionsSet.forEach(region => {
-            filterRegion.innerHTML += `<option value="${region}">${region}</option>`;
-        });
-
         renderPosts();
     });
-
-    filterRegion.addEventListener("change", renderPosts);
-    filterDisponibilidad.addEventListener("change", renderPosts);
 
 });
 </script>

@@ -14,7 +14,18 @@
 
         <div id="nav-buttons" style="margin:15px 0;"></div>
 
-        <br>
+        <!-- 🔎 FILTROS -->
+        <div style="margin-bottom:20px;">
+            <select id="filter-region">
+                <option value="">Todas las regiones</option>
+            </select>
+
+            <select id="filter-disponibilidad" style="margin-left:10px;">
+                <option value="">Todas las disponibilidades</option>
+                <option value="Inmediata">Disponibilidad inmediata</option>
+                <option value="Completando horario">Completando horario</option>
+            </select>
+        </div>
 
         <div id="posts-container"></div>
     </div>
@@ -31,10 +42,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const postsContainer = document.getElementById("posts-container");
     const navButtons = document.getElementById("nav-buttons");
+    const filterRegion = document.getElementById("filter-region");
+    const filterDisponibilidad = document.getElementById("filter-disponibilidad");
+
+    let allPosts = [];
 
     // 🔹 Mostrar botones según sesión
     firebase.auth().onAuthStateChanged(user => {
-
         if (user) {
             navButtons.innerHTML = `
                 <button onclick="window.location.href='post-job.html'">
@@ -54,7 +68,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 </button>
             `;
         }
-
     });
 
     window.logout = function() {
@@ -63,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    // 🔹 Función para calcular tiempo restante
+    // 🔹 Función contador
     function getTimeRemaining(expiresAt) {
         const now = new Date();
         const expireDate = expiresAt.toDate();
@@ -77,41 +90,42 @@ document.addEventListener("DOMContentLoaded", () => {
         return `Expira en: ${hours}h ${minutes}m`;
     }
 
-    // 🔹 Cargar avisos activos
-    db.collection("posts")
-      .where("expiresAt", ">", firebase.firestore.Timestamp.now())
-      .orderBy("expiresAt")
-      .onSnapshot(snapshot => {
+    // 🔹 Renderizar avisos
+    function renderPosts() {
 
         postsContainer.innerHTML = "";
 
-        if (snapshot.empty) {
-            postsContainer.innerHTML = "<p>No hay avisos activos.</p>";
+        const selectedRegion = filterRegion.value;
+        const selectedDisponibilidad = filterDisponibilidad.value;
+
+        const filtered = allPosts.filter(post => {
+            const regionMatch = selectedRegion === "" || post.region === selectedRegion;
+            const disponibilidadMatch = selectedDisponibilidad === "" || post.disponibilidad === selectedDisponibilidad;
+            return regionMatch && disponibilidadMatch;
+        });
+
+        if (filtered.length === 0) {
+            postsContainer.innerHTML = "<p>No hay avisos con esos filtros.</p>";
             return;
         }
 
-        snapshot.forEach(doc => {
-            const post = doc.data();
+        filtered.forEach(post => {
 
             const postDiv = document.createElement("div");
-            postDiv.style.border = "1px solid #ddd";
-            postDiv.style.padding = "10px";
-            postDiv.style.marginBottom = "10px";
 
             postDiv.innerHTML = `
                 <h3>${post.nombre}</h3>
                 <p><strong>${post.profesion}</strong></p>
                 <p>${post.region} - ${post.comuna}</p>
                 <p>${post.disponibilidad}</p>
-                <p id="timer-${doc.id}" style="color:#c0392b; font-weight:bold;"></p>
-                <div id="contact-${doc.id}"></div>
+                <p id="timer-${post.id}"></p>
+                <div id="contact-${post.id}"></div>
             `;
 
             postsContainer.appendChild(postDiv);
 
-            // 🔹 Actualizar contador cada minuto
             function updateTimer() {
-                const timerElement = document.getElementById(`timer-${doc.id}`);
+                const timerElement = document.getElementById(`timer-${post.id}`);
                 if (timerElement) {
                     timerElement.innerText = getTimeRemaining(post.expiresAt);
                 }
@@ -121,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
             setInterval(updateTimer, 60000);
 
             firebase.auth().onAuthStateChanged(user => {
-                const contactDiv = document.getElementById(`contact-${doc.id}`);
+                const contactDiv = document.getElementById(`contact-${post.id}`);
 
                 if (user) {
                     contactDiv.innerHTML = `
@@ -135,8 +149,35 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
         });
+    }
 
+    // 🔹 Cargar avisos
+    db.collection("posts")
+      .where("expiresAt", ">", firebase.firestore.Timestamp.now())
+      .orderBy("expiresAt")
+      .onSnapshot(snapshot => {
+
+        allPosts = [];
+        const regionsSet = new Set();
+
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            data.id = doc.id;
+            allPosts.push(data);
+            regionsSet.add(data.region);
+        });
+
+        // Cargar regiones únicas en el filtro
+        filterRegion.innerHTML = `<option value="">Todas las regiones</option>`;
+        regionsSet.forEach(region => {
+            filterRegion.innerHTML += `<option value="${region}">${region}</option>`;
+        });
+
+        renderPosts();
     });
+
+    filterRegion.addEventListener("change", renderPosts);
+    filterDisponibilidad.addEventListener("change", renderPosts);
 
 });
 </script>

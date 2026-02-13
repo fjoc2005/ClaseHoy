@@ -11,6 +11,9 @@
     <div class="auth-card">
         <h1>ClaseHoy</h1>
         <p>Profesores disponibles para reemplazos inmediatos</p>
+
+        <div id="nav-buttons" style="margin:15px 0;"></div>
+
         <br>
 
         <div id="posts-container"></div>
@@ -27,7 +30,40 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     const postsContainer = document.getElementById("posts-container");
+    const navButtons = document.getElementById("nav-buttons");
 
+    // 🔹 Mostrar botones según sesión
+    firebase.auth().onAuthStateChanged(user => {
+
+        if (user) {
+            navButtons.innerHTML = `
+                <button onclick="window.location.href='post-job.html'">
+                    Publicar Aviso
+                </button>
+                <button onclick="logout()" style="margin-left:10px;">
+                    Cerrar sesión
+                </button>
+            `;
+        } else {
+            navButtons.innerHTML = `
+                <button onclick="window.location.href='login.html'">
+                    Iniciar sesión
+                </button>
+                <button onclick="window.location.href='register.html'" style="margin-left:10px;">
+                    Registrarse
+                </button>
+            `;
+        }
+
+    });
+
+    window.logout = function() {
+        firebase.auth().signOut().then(() => {
+            window.location.reload();
+        });
+    };
+
+    // 🔹 Cargar avisos activos
     const now = firebase.firestore.Timestamp.now();
 
     db.collection("posts")

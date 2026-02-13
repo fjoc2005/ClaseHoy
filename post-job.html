@@ -1,172 +1,129 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Publicar Aviso - ClaseHoy</title>
     <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
 <body>
-    <header>
-        <div class="container header-content">
-            <a href="index.html" class="logo">ClaseHoy</a>
-            <nav id="main-nav">
-                <!-- Populated by JS -->
-            </nav>
-        </div>
-    </header>
 
-    <main class="container mt-4">
-        <div class="card fade-in">
-            <h2 class="font-bold mb-4 gradient-text">Publicar Reemplazo</h2>
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Publicar Aviso de Disponibilidad</h2>
 
-            <form id="post-job-form">
-                <!-- <div class="input-group">
-                    <label for="institution">Institución Educativa</label>
-                    <input type="text" id="institution" name="institution" placeholder="Ej. Colegio San Martín"
-                        required>
-                </div> -->
-                <!-- Institution is now auto-filled from User Profile -->
-                <div class="input-group">
-                    <label>Institución / Publicador</label>
-                    <input type="text" id="institution-preview" disabled
-                        style="background: #f1f5f9; cursor: not-allowed;">
-                    <p class="text-xs text-muted mt-1">Se publicará con el nombre de tu perfil.</p>
-                </div>
+        <div id="message" style="margin-bottom:10px;"></div>
 
-                <div class="input-group">
-                    <label for="position">Asignatura / Cargo</label>
-                    <select id="position" name="position" required>
-                        <option value="">Seleccionar asignatura...</option>
-                        <!-- Populated by JS -->
-                    </select>
-                </div>
+        <form id="post-form">
+            <input type="text" name="profesion" placeholder="Profesión (Ej: Profesor de Matemática)" required>
 
-                <div class="input-group">
-                    <label for="region">Región</label>
-                    <select id="region" name="region" required>
-                        <option value="">Seleccionar región...</option>
-                        <!-- Populated by JS -->
-                    </select>
-                </div>
+            <input type="text" name="region" placeholder="Región" required>
 
-                <div class="input-group">
-                    <label for="comuna">Comuna</label>
-                    <select id="comuna" name="comuna" required disabled>
-                        <option value="">Primero selecciona una región</option>
-                    </select>
-                </div>
+            <input type="text" name="comuna" placeholder="Comuna" required>
 
-                <div class="input-group">
-                    <label for="contact">Contacto (Teléfono o Email)</label>
-                    <input type="text" id="contact" name="contact" placeholder="+569... o contacto@mail.com" required>
-                    <p class="text-xs text-muted mt-1"><i class="fa-solid fa-lock"></i>
-                        Este será el contacto que se entregará al postulante <strong>solo si tú aceptas</strong> su
-                        solicitud de contacto.
-                    </p>
-                </div>
+            <select name="disponibilidad" required>
+                <option value="">Seleccionar disponibilidad</option>
+                <option value="Inmediata">Disponibilidad inmediata</option>
+                <option value="Completando horario">Completando horario</option>
+            </select>
 
-                <div class="input-group">
-                    <label for="urgency">Urgencia</label>
-                    <select id="urgency" name="urgency">
-                        <option value="normal">Normal (Reemplazo futuro)</option>
-                        <option value="alta">Alta (Para hoy/mañana)</option>
-                    </select>
-                </div>
+            <button type="submit">Publicar Aviso (24 horas)</button>
+        </form>
 
-                <!-- Mandatory Legal Checkbox -->
-                <div class="input-group legal-check"
-                    style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
-                    <label
-                        style="display: flex; align-items: flex-start; gap: 0.5rem; cursor: pointer; font-weight: 400; font-size: 0.9em;">
-                        <input type="checkbox" id="legal-consent" required style="width: auto; margin-top: 4px;">
-                        <span>
-                            Declaro que comprendo que esta plataforma solo publica información y no actúa como
-                            intermediaria laboral, ni valida ni garantiza los avisos publicados.
-                            <br><strong class="text-xs text-muted">(🔒 Sin marcar no se publica)</strong>
-                        </span>
-                    </label>
-                </div>
+        <br>
+        <button id="logout-btn">Cerrar sesión</button>
+    </div>
+</div>
 
-                <button type="submit" class="btn btn-primary btn-block mt-4">
-                    <i class="fa-solid fa-paper-plane mr-2"></i> Publicar Aviso
-                </button>
-            </form>
-        </div>
-    </main>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/auth.js"></script>
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="assets/js/firebase-config.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
 
-    <script src="assets/js/chile-data.js"></script>
-    <script src="assets/js/auth.js"></script>
-    <script src="assets/js/app.js"></script>
-    <script>
-        // Check authentication
-        if (!Auth.isAuthenticated()) {
-            alert('Debes iniciar sesión para publicar un aviso');
-            window.location.href = 'login.html';
-        } else {
-            // Fill preview
-            const user = Auth.getCurrentUser();
-            if (user) document.getElementById('institution-preview').value = user.nombre;
+    const user = firebase.auth().currentUser;
+
+    firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+            window.location.href = "login.html";
+        }
+    });
+
+    const form = document.getElementById("post-form");
+    const messageDiv = document.getElementById("message");
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const currentUser = firebase.auth().currentUser;
+
+        if (!currentUser) {
+            window.location.href = "login.html";
+            return;
         }
 
-        // Setup navigation
-        if (App.mainNav) {
-            App.setupNavigation();
+        messageDiv.innerHTML = "Publicando...";
+
+        const formData = new FormData(form);
+
+        const profesion = formData.get("profesion");
+        const region = formData.get("region");
+        const comuna = formData.get("comuna");
+        const disponibilidad = formData.get("disponibilidad");
+
+        const now = firebase.firestore.Timestamp.now();
+        const expiresAt = new firebase.firestore.Timestamp(
+            now.seconds + (24 * 60 * 60),
+            now.nanoseconds
+        );
+
+        try {
+
+            // Eliminar aviso anterior del usuario
+            const existing = await db.collection("posts")
+                .where("userId", "==", currentUser.uid)
+                .get();
+
+            existing.forEach(doc => {
+                doc.ref.delete();
+            });
+
+            // Obtener nombre del usuario
+            const userDoc = await db.collection("users").doc(currentUser.uid).get();
+            const nombre = userDoc.data().nombre;
+
+            // Crear nuevo aviso
+            await db.collection("posts").add({
+                nombre: nombre,
+                profesion: profesion,
+                region: region,
+                comuna: comuna,
+                disponibilidad: disponibilidad,
+                email: currentUser.email,
+                userId: currentUser.uid,
+                createdAt: now,
+                expiresAt: expiresAt
+            });
+
+            messageDiv.innerHTML = "✅ Aviso publicado correctamente (activo 24 horas)";
+            form.reset();
+
+        } catch (error) {
+            console.error(error);
+            messageDiv.innerHTML = "❌ Error al publicar aviso";
         }
+    });
 
-        // Populate regions
-        const regionSelect = document.getElementById('region');
-        const comunaSelect = document.getElementById('comuna');
+    document.getElementById("logout-btn").addEventListener("click", async () => {
+        await firebase.auth().signOut();
+        window.location.href = "index.html";
+    });
 
-        ChileData.regions.forEach(region => {
-            const option = document.createElement('option');
-            option.value = region.nombre;
-            option.textContent = region.nombre;
-            option.dataset.regionId = region.id;
-            regionSelect.appendChild(option);
-        });
+});
+</script>
 
-        // Populate subjects
-        const positionSelect = document.getElementById('position');
-        ChileData.subjects.forEach(subject => {
-            const option = document.createElement('option');
-            option.value = subject;
-            option.textContent = subject;
-            positionSelect.appendChild(option);
-        });
-
-        // Handle region change - populate communes
-        regionSelect.addEventListener('change', (e) => {
-            const selectedOption = e.target.selectedOptions[0];
-            const regionId = selectedOption.dataset.regionId;
-
-            comunaSelect.disabled = !regionId;
-            comunaSelect.innerHTML = '<option value="">Seleccionar comuna...</option>';
-
-            if (regionId) {
-                const comunas = ChileData.getComunasByRegion(regionId);
-                comunas.forEach(comuna => {
-                    const option = document.createElement('option');
-                    option.value = comuna;
-                    option.textContent = comuna;
-                    comunaSelect.appendChild(option);
-                });
-            }
-        });
-    </script>
 </body>
-
 </html>

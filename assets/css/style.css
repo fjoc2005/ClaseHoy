@@ -1,12 +1,14 @@
 :root {
-    --primary: #004aad;
-    --primary-hover: #003073;
-    --secondary: #00b4d8;
-    --accent: #10b981;
-    --dark: #0f172a;
-    --light: #f1f5f9;
+    /* PALETA AZUL MARINO → CELESTE */
+    --blue-darkest: #0B3C5D;
+    --blue-deep: #0F4C81;
+    --blue-medium: #1F6F8B;
+    --blue-soft: #4FA3D1;
+    --blue-light: #B9E6FF;
+    --blue-bg: #F4FAFF;
+
     --white: #ffffff;
-    --text: #334155;
+    --text: #1e293b;
     --text-muted: #64748b;
     --border: #e2e8f0;
 }
@@ -20,9 +22,21 @@
 }
 
 body {
-    background: var(--light);
+    background: var(--blue-bg);
     color: var(--text);
     min-height: 100vh;
+}
+
+/* HEADER CON LOGO */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 0 10px 0;
+}
+
+.logo {
+    width: 180px;
 }
 
 /* LAYOUT PRINCIPAL */
@@ -35,120 +49,148 @@ body {
 .auth-card {
     background: var(--white);
     width: 100%;
-    max-width: 800px;
+    max-width: 900px;
     padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    border-radius: 24px;
+    box-shadow: 0 15px 40px rgba(11, 60, 93, 0.08);
 }
 
 /* TITULOS */
 h1 {
     font-size: 2.5rem;
     font-weight: 700;
-    color: var(--primary);
+    color: var(--blue-darkest);
     margin-bottom: 10px;
+}
+
+h2 {
+    color: var(--blue-deep);
+    margin-bottom: 20px;
 }
 
 h3 {
     font-size: 1.3rem;
     margin-bottom: 6px;
-    color: var(--dark);
+    color: var(--blue-darkest);
 }
 
 p {
     margin-bottom: 6px;
 }
 
-/* NAV BUTTONS */
-#nav-buttons button {
-    padding: 10px 18px;
-    border-radius: 12px;
+/* BOTONES */
+button {
+    padding: 12px;
+    border-radius: 14px;
     border: none;
     font-weight: 600;
     cursor: pointer;
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--blue-deep), var(--blue-medium));
     color: white;
-    transition: 0.2s;
+    transition: 0.25s ease;
 }
 
-#nav-buttons button:hover {
-    background: var(--primary-hover);
+button:hover {
+    background: linear-gradient(135deg, var(--blue-darkest), var(--blue-deep));
     transform: translateY(-2px);
+}
+
+/* NAV BUTTONS */
+#nav-buttons button {
+    margin-right: 10px;
 }
 
 /* TARJETAS DE AVISOS */
 #posts-container > div {
     background: var(--white);
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 20px;
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 25px;
     border: 1px solid var(--border);
-    transition: 0.2s;
+    transition: 0.25s ease;
 }
 
 #posts-container > div:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.05);
+    transform: translateY(-6px);
+    box-shadow: 0 18px 35px rgba(15, 76, 129, 0.1);
 }
 
 #posts-container strong {
-    color: var(--primary);
+    color: var(--blue-deep);
 }
 
 /* CONTADOR */
 [id^="timer-"] {
     margin-top: 10px;
-    padding: 6px 10px;
+    padding: 6px 12px;
     display: inline-block;
-    background: rgba(16,185,129,0.1);
-    color: var(--accent);
-    border-radius: 8px;
+    background: rgba(31,111,139,0.1);
+    color: var(--blue-medium);
+    border-radius: 10px;
     font-weight: 600;
     font-size: 0.9rem;
 }
 
 /* CONTACTO */
-[id^="contact-"] {
-    margin-top: 12px;
-    font-size: 0.9rem;
-}
-
 [id^="contact-"] p {
-    background: rgba(0,74,173,0.05);
-    padding: 8px 10px;
-    border-radius: 8px;
+    background: rgba(79,163,209,0.1);
+    padding: 10px;
+    border-radius: 10px;
 }
 
 /* FORMULARIOS */
 input, select {
     width: 100%;
-    padding: 12px;
-    margin-bottom: 14px;
-    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 16px;
+    border-radius: 12px;
     border: 1px solid var(--border);
     font-size: 1rem;
+    transition: 0.2s;
 }
 
 input:focus, select:focus {
     outline: none;
-    border-color: var(--secondary);
-    box-shadow: 0 0 0 3px rgba(0,180,216,0.1);
+    border-color: var(--blue-soft);
+    box-shadow: 0 0 0 3px rgba(79,163,209,0.15);
 }
 
-button {
-    padding: 12px;
-    border-radius: 12px;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-    background: var(--primary);
-    color: white;
-    transition: 0.2s;
+/* ===== CATEGORÍAS ===== */
+.categoria-lenguaje {
+    border-left: 6px solid var(--blue-deep);
 }
 
-button:hover {
-    background: var(--primary-hover);
-    transform: translateY(-2px);
+.categoria-matematicas {
+    border-left: 6px solid var(--blue-medium);
+}
+
+.categoria-ciencias {
+    border-left: 6px solid var(--blue-darkest);
+}
+
+.categoria-historia {
+    border-left: 6px solid var(--blue-soft);
+}
+
+.categoria-ingles {
+    border-left: 6px solid var(--blue-light);
+}
+
+/* ===== REGIONES ===== */
+.region-metropolitana {
+    background: rgba(15,76,129,0.05);
+}
+
+.region-los-lagos {
+    background: rgba(79,163,209,0.08);
+}
+
+.region-valparaiso {
+    background: rgba(31,111,139,0.08);
+}
+
+.region-biobio {
+    background: rgba(11,60,93,0.05);
 }
 
 /* RESPONSIVE */
@@ -159,5 +201,9 @@ button:hover {
 
     h1 {
         font-size: 2rem;
+    }
+
+    .logo {
+        width: 140px;
     }
 }

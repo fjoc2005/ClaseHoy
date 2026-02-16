@@ -91,7 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const regionSelect = document.getElementById("region");
     const comunaSelect = document.getElementById("comuna");
 
-    // 🔹 Comunas simplificadas (puedo ampliarlas completas después)
     const comunasPorRegion = {
         "Metropolitana": ["Santiago","Providencia","Las Condes","Maipú","Puente Alto","Ñuñoa"],
         "Valparaíso": ["Valparaíso","Viña del Mar","Quilpué","Villa Alemana","San Antonio"],
@@ -146,7 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
 
-                // 🔹 Verificar si ya tiene aviso activo
                 const existing = await db.collection("posts")
                     .where("userId","==",user.uid)
                     .where("expiresAt",">",firebase.firestore.Timestamp.now())
@@ -171,9 +169,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 message.style.color = "green";
-                message.innerText = "Tu aviso ha sido publicado.";
+                message.innerText = "Tu aviso ha sido publicado. Redirigiendo...";
 
-                form.reset();
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 1200);
 
             } catch (error) {
                 message.style.color = "red";

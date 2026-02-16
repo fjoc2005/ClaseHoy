@@ -9,7 +9,28 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: linear-gradient(135deg, #667eea, #764ba2);
     margin: 0;
-    padding: 40px 20px;
+    padding: 0;
+}
+
+/* ===== HEADER CON LOGO ===== */
+.main-header {
+    width: 100%;
+    background: white;
+    padding: 15px 0;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.logo {
+    height: 60px;
+    object-fit: contain;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.logo:hover {
+    transform: scale(1.05);
 }
 
 .auth-card {
@@ -17,7 +38,7 @@ body {
     padding: 30px;
     border-radius: 16px;
     max-width: 750px;
-    margin: auto;
+    margin: 40px auto;
     box-shadow: 0 20px 40px rgba(0,0,0,0.15);
 }
 
@@ -122,8 +143,13 @@ button:hover {
 </head>
 <body>
 
+<header class="main-header">
+    <a href="index.html">
+        <img src="images/logo.png" alt="ClaseHoy Logo" class="logo">
+    </a>
+</header>
+
 <div class="auth-card">
-    <h1>ClaseHoy</h1>
     <p>Profesores disponibles para reemplazos inmediatos</p>
 
     <div id="nav-buttons" style="margin:15px 0;"></div>
@@ -147,7 +173,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentUser = null;
     let firstLoad = true;
 
-    /* ---------- AUTH ---------- */
     firebase.auth().onAuthStateChanged(user => {
         currentUser = user;
 
@@ -198,7 +223,6 @@ document.addEventListener("DOMContentLoaded", () => {
         await db.collection("posts").doc(postId).delete();
     };
 
-    /* ---------- FIRESTORE ---------- */
     db.collection("posts")
       .where("expiresAt", ">", firebase.firestore.Timestamp.now())
       .orderBy("expiresAt")

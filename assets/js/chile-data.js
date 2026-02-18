@@ -227,7 +227,7 @@ const ChileData = {
                 },
                 {
                     nombre: 'Biobío',
-                    comunas: ['Los Ángeles', 'Antuco', 'Cabrero', 'Laja', 'Mulchén', 'Nacimiento', 'Negrete', 'Quilaco', 'Quilleco', 'San Rosendo', 'Santa Bárbara', 'Tucapel', 'Yumbel']
+                    comunas: ['Los Ángeles', 'Antuco', 'Cabrero', 'Laja', 'Mulchén', 'Nacimiento', 'Negrete', 'Quilaco', 'Quilleco', 'San Rosendo', 'Santa Bárbara', 'Tucapel', 'Yumbel', 'Alto Biobío']
                 }
             ]
         },
@@ -351,8 +351,8 @@ const ChileData = {
     /**
      * Get all communes for a specific region
      */
-    getComunasByRegion(regionId) {
-        const region = this.regions.find(r => r.id === regionId || r.nombre === regionId);
+    getComunasByRegion(regionNombre) {
+        const region = this.regions.find(r => r.nombre === regionNombre);
         if (!region) return [];
 
         const comunas = [];

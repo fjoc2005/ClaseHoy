@@ -2,22 +2,24 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Publicar Aviso - ClaseHoy</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
 <div class="auth-container">
-    <div class="auth-card">
-        <h2>Publicar Aviso</h2>
+    <div class="auth-card" style="max-width: 600px;">
+        <h2 style="color: var(--purple-dark); text-align: center; margin-bottom: 10px;">📝 Publicar Aviso</h2>
+        <p style="text-align: center; color: var(--gray-600); margin-bottom: 30px;">Tu aviso estará visible por 24 horas</p>
 
         <form id="postForm">
 
-            <input type="text" id="nombre" placeholder="Nombre completo" required>
+            <input type="text" id="nombre" placeholder="👤 Nombre completo" required>
 
             <!-- PROFESION -->
             <select id="profesion" required>
-                <option value="">Seleccione profesión</option>
+                <option value="">📚 Seleccione profesión</option>
                 <option>Profesor/a de Lenguaje</option>
                 <option>Profesor/a de Matemática</option>
                 <option>Profesor/a de Historia</option>
@@ -37,42 +39,68 @@
 
             <!-- REGION -->
             <select id="region" required>
-                <option value="">Seleccione Región</option>
+                <option value="">📍 Seleccione Región</option>
                 <option>Arica y Parinacota</option>
                 <option>Tarapacá</option>
                 <option>Antofagasta</option>
                 <option>Atacama</option>
                 <option>Coquimbo</option>
                 <option>Valparaíso</option>
-                <option>Metropolitana</option>
-                <option>O'Higgins</option>
+                <option>Metropolitana de Santiago</option>
+                <option>Libertador General Bernardo O'Higgins</option>
                 <option>Maule</option>
                 <option>Ñuble</option>
                 <option>Biobío</option>
                 <option>La Araucanía</option>
                 <option>Los Ríos</option>
                 <option>Los Lagos</option>
-                <option>Aysén</option>
-                <option>Magallanes</option>
+                <option>Aysén del General Carlos Ibáñez del Campo</option>
+                <option>Magallanes y de la Antártica Chilena</option>
             </select>
 
             <!-- COMUNA -->
             <select id="comuna" required>
-                <option value="">Seleccione Comuna</option>
+                <option value="">🏘️ Seleccione Comuna</option>
             </select>
 
             <!-- DISPONIBILIDAD -->
             <select id="disponibilidad" required>
-                <option value="">Disponibilidad</option>
+                <option value="">⏰ Disponibilidad</option>
                 <option>Disponible inmediato</option>
                 <option>Completando horario</option>
             </select>
 
-            <button type="submit">Publicar Aviso</button>
+            <!-- CHECKBOX DE TÉRMINOS Y CONDICIONES -->
+            <div style="margin: 20px 0; padding: 15px; background: #fff3cd; border-radius: 12px; border: 2px solid #ffc107;">
+                <label style="display: flex; align-items: start; gap: 12px; cursor: pointer;">
+                    <input 
+                        type="checkbox" 
+                        id="terms-checkbox-post" 
+                        required
+                        style="width: 20px; height: 20px; margin-top: 2px; cursor: pointer; flex-shrink: 0;"
+                    >
+                    <span style="font-size: 13px; color: #856404; line-height: 1.5;">
+                        <strong>⚠️ Importante:</strong> Confirmo que la información publicada es verdadera y acepto que ClaseHoy solo actúa como intermediario tecnológico. 
+                        <a href="terminos.html" target="_blank" style="color: #0f4c81; font-weight: 600; text-decoration: none;">
+                            Ver términos completos
+                        </a>
+                    </span>
+                </label>
+            </div>
+
+            <button type="submit" style="width: 100%; margin-top: 10px;">
+                ✅ Publicar Aviso (24h)
+            </button>
 
         </form>
 
-        <p id="message"></p>
+        <p id="message" style="margin-top: 15px; font-weight: 600;"></p>
+
+        <p style="text-align: center; margin-top: 20px;">
+            <a href="index.html" style="color: var(--gray-600); font-size: 14px; text-decoration: none;">
+                ← Volver a avisos
+            </a>
+        </p>
     </div>
 </div>
 
@@ -80,6 +108,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/chile-data.js"></script>
 
 <script>
 
@@ -91,28 +120,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const regionSelect = document.getElementById("region");
     const comunaSelect = document.getElementById("comuna");
 
+    // Mapa simplificado de comunas principales (se puede expandir con chile-data.js)
     const comunasPorRegion = {
-        "Metropolitana": ["Santiago","Providencia","Las Condes","Maipú","Puente Alto","Ñuñoa"],
-        "Valparaíso": ["Valparaíso","Viña del Mar","Quilpué","Villa Alemana","San Antonio"],
-        "Biobío": ["Concepción","Talcahuano","Los Ángeles","Chillán"],
-        "La Araucanía": ["Temuco","Villarrica","Angol"],
-        "Los Lagos": ["Puerto Montt","Osorno","Castro"],
-        "Antofagasta": ["Antofagasta","Calama"],
-        "Coquimbo": ["La Serena","Coquimbo"],
-        "Maule": ["Talca","Curicó"],
-        "O'Higgins": ["Rancagua","San Fernando"],
-        "Atacama": ["Copiapó","Vallenar"],
-        "Tarapacá": ["Iquique"],
-        "Arica y Parinacota": ["Arica"],
-        "Ñuble": ["Chillán"],
-        "Los Ríos": ["Valdivia"],
-        "Aysén": ["Coyhaique"],
-        "Magallanes": ["Punta Arenas"]
+        "Arica y Parinacota": ["Arica", "Camarones", "Putre", "General Lagos"],
+        "Tarapacá": ["Iquique", "Alto Hospicio", "Pozo Almonte", "Camiña", "Colchane", "Huara", "Pica"],
+        "Antofagasta": ["Antofagasta", "Mejillones", "Sierra Gorda", "Taltal", "Calama", "Ollagüe", "San Pedro de Atacama", "Tocopilla", "María Elena"],
+        "Atacama": ["Copiapó", "Caldera", "Tierra Amarilla", "Chañaral", "Diego de Almagro", "Vallenar", "Alto del Carmen", "Freirina", "Huasco"],
+        "Coquimbo": ["La Serena", "Coquimbo", "Andacollo", "La Higuera", "Paiguano", "Vicuña", "Illapel", "Canela", "Los Vilos", "Salamanca", "Ovalle", "Combarbalá", "Monte Patria", "Punitaqui", "Río Hurtado"],
+        "Valparaíso": ["Valparaíso", "Casablanca", "Concón", "Juan Fernández", "Puchuncaví", "Quintero", "Viña del Mar", "Isla de Pascua", "Los Andes", "Calle Larga", "Rinconada", "San Esteban", "La Ligua", "Cabildo", "Papudo", "Petorca", "Zapallar", "Quillota", "Calera", "Hijuelas", "La Cruz", "Nogales", "San Antonio", "Algarrobo", "Cartagena", "El Quisco", "El Tabo", "Santo Domingo", "San Felipe", "Catemu", "Llaillay", "Panquehue", "Putaendo", "Santa María", "Quilpué", "Limache", "Olmué", "Villa Alemana"],
+        "Metropolitana de Santiago": ["Santiago", "Cerrillos", "Cerro Navia", "Conchalí", "El Bosque", "Estación Central", "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja", "La Pintana", "La Reina", "Las Condes", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú", "Ñuñoa", "Pedro Aguirre Cerda", "Peñalolén", "Providencia", "Pudahuel", "Quilicura", "Quinta Normal", "Recoleta", "Renca", "San Joaquín", "San Miguel", "San Ramón", "Vitacura", "Puente Alto", "Pirque", "San José de Maipo", "Colina", "Lampa", "Tiltil", "San Bernardo", "Buin", "Calera de Tango", "Paine", "Melipilla", "Alhué", "Curacaví", "María Pinto", "San Pedro", "Talagante", "El Monte", "Isla de Maipo", "Padre Hurtado", "Peñaflor"],
+        "Libertador General Bernardo O'Higgins": ["Rancagua", "Codegua", "Coinco", "Coltauco", "Doñihue", "Graneros", "Las Cabras", "Machalí", "Malloa", "Mostazal", "Olivar", "Peumo", "Pichidegua", "Quinta de Tilcoco", "Rengo", "Requínoa", "San Vicente", "Pichilemu", "La Estrella", "Litueche", "Marchihue", "Navidad", "Paredones", "San Fernando", "Chépica", "Chimbarongo", "Lolol", "Nancagua", "Palmilla", "Peralillo", "Placilla", "Pumanque", "Santa Cruz"],
+        "Maule": ["Talca", "Constitución", "Curepto", "Empedrado", "Maule", "Pelarco", "Pencahue", "Río Claro", "San Clemente", "San Rafael", "Cauquenes", "Chanco", "Pelluhue", "Curicó", "Hualañé", "Licantén", "Molina", "Rauco", "Romeral", "Sagrada Familia", "Teno", "Vichuquén", "Linares", "Colbún", "Longaví", "Parral", "Retiro", "San Javier", "Villa Alegre", "Yerbas Buenas"],
+        "Ñuble": ["Chillán", "Bulnes", "Chillán Viejo", "El Carmen", "Pemuco", "Pinto", "Quillón", "San Ignacio", "Yungay", "Quirihue", "Cobquecura", "Coelemu", "Ninhue", "Portezuelo", "Ranquil", "Treguaco", "San Carlos", "Coihueco", "Ñiquén", "San Fabián", "San Nicolás"],
+        "Biobío": ["Concepción", "Coronel", "Chiguayante", "Florida", "Hualqui", "Lota", "Penco", "San Pedro de la Paz", "Santa Juana", "Talcahuano", "Tomé", "Hualpén", "Lebu", "Arauco", "Cañete", "Contulmo", "Curanilahue", "Los Álamos", "Tirúa", "Los Ángeles", "Antuco", "Cabrero", "Laja", "Mulchén", "Nacimiento", "Negrete", "Quilaco", "Quilleco", "San Rosendo", "Santa Bárbara", "Tucapel", "Yumbel", "Alto Biobío"],
+        "La Araucanía": ["Temuco", "Carahue", "Cunco", "Curarrehue", "Freire", "Galvarino", "Gorbea", "Lautaro", "Loncoche", "Melipeuco", "Nueva Imperial", "Padre Las Casas", "Perquenco", "Pitrufquén", "Pucón", "Saavedra", "Teodoro Schmidt", "Toltén", "Vilcún", "Villarrica", "Cholchol", "Angol", "Collipulli", "Curacautín", "Ercilla", "Lonquimay", "Los Sauces", "Lumaco", "Purén", "Renaico", "Traiguén", "Victoria"],
+        "Los Ríos": ["Valdivia", "Corral", "Lanco", "Los Lagos", "Máfil", "Mariquina", "Paillaco", "Panguipulli", "La Unión", "Futrono", "Lago Ranco", "Río Bueno"],
+        "Los Lagos": ["Puerto Montt", "Calbuco", "Cochamó", "Fresia", "Frutillar", "Los Muermos", "Llanquihue", "Maullín", "Puerto Varas", "Castro", "Ancud", "Chonchi", "Curaco de Vélez", "Dalcahue", "Puqueldón", "Queilén", "Quellón", "Quemchi", "Quinchao", "Osorno", "Puerto Octay", "Purranque", "Puyehue", "Río Negro", "San Juan de la Costa", "San Pablo", "Chaitén", "Futaleufú", "Hualaihué", "Palena"],
+        "Aysén del General Carlos Ibáñez del Campo": ["Coyhaique", "Lago Verde", "Aysén", "Cisnes", "Guaitecas", "Cochrane", "O'Higgins", "Tortel", "Chile Chico", "Río Ibáñez"],
+        "Magallanes y de la Antártica Chilena": ["Punta Arenas", "Laguna Blanca", "Río Verde", "San Gregorio", "Cabo de Hornos", "Antártica", "Porvenir", "Primavera", "Timaukel", "Natales", "Torres del Paine"]
     };
 
     regionSelect.addEventListener("change", () => {
         const region = regionSelect.value;
-        comunaSelect.innerHTML = '<option value="">Seleccione Comuna</option>';
+        comunaSelect.innerHTML = '<option value="">🏘️ Seleccione Comuna</option>';
 
         if (comunasPorRegion[region]) {
             comunasPorRegion[region].forEach(comuna => {
@@ -134,6 +164,14 @@ document.addEventListener("DOMContentLoaded", () => {
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
 
+            // Verificar checkbox de términos
+            const termsCheckbox = document.getElementById('terms-checkbox-post');
+            if (!termsCheckbox.checked) {
+                message.style.color = "red";
+                message.innerText = "⚠️ Debes confirmar la veracidad de la información";
+                return;
+            }
+
             const nombre = document.getElementById("nombre").value;
             const profesion = document.getElementById("profesion").value;
             const region = regionSelect.value;
@@ -152,7 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (!existing.empty) {
                     message.style.color = "red";
-                    message.innerText = "Ya tienes un aviso activo.";
+                    message.innerText = "⚠️ Ya tienes un aviso activo. Elimínalo primero o espera 24 horas.";
                     return;
                 }
 
@@ -169,15 +207,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 message.style.color = "green";
-                message.innerText = "Tu aviso ha sido publicado. Redirigiendo...";
+                message.innerText = "✅ Tu aviso ha sido publicado. Redirigiendo...";
 
                 setTimeout(() => {
                     window.location.href = "index.html";
-                }, 1200);
+                }, 1500);
 
             } catch (error) {
                 message.style.color = "red";
-                message.innerText = "Error al publicar aviso.";
+                message.innerText = "❌ Error al publicar aviso. Intenta nuevamente.";
                 console.error(error);
             }
 

@@ -2,265 +2,48 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ClaseHoy - Profesores Disponibles</title>
+<title>ClaseHoy</title>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
+
 <body>
 
-<div class="main-header">
-    <h1>📚 ClaseHoy</h1>
-    <p>Profesores disponibles para reemplazos inmediatos</p>
-</div>
+<header class="main-header">
+    <a href="index.html">
+        <img src="assets/images/logo.png" alt="ClaseHoy Logo" class="logo">
+    </a>
+</header>
 
 <div class="auth-card">
-    <!-- Botones de navegación -->
-    <div id="nav-buttons"></div>
-
-    <!-- FILTROS -->
-    <div class="filters">
-        <select id="filter-region">
-            <option value="">🌎 Todas las regiones</option>
-        </select>
-
-        <select id="filter-comuna">
-            <option value="">🏘️ Todas las comunas</option>
-        </select>
-
-        <select id="filter-profesion">
-            <option value="">📚 Todas las profesiones</option>
-        </select>
-    </div>
-
-    <!-- Contenedor de posts -->
-    <div id="posts-container">
-        <div class="no-posts">
-            <p>⏳ Cargando avisos...</p>
-        </div>
-    </div>
+    <p><strong>Profesores disponibles para reemplazos inmediatos</strong></p>
+    <div id="nav-buttons" style="margin:15px 0;"></div>
+    <div id="posts-container"></div>
 </div>
 
-<!-- Contenedor de notificaciones -->
 <div id="notification-container"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 <script src="assets/js/firebase-config.js"></script>
-<script src="assets/js/chile-data.js"></script>
+<script src="assets/js/backend-service.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/app.js"></script>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-
-    const postsContainer = document.getElementById("posts-container");
-    const navButtons = document.getElementById("nav-buttons");
-    const notificationContainer = document.getElementById("notification-container");
-    const filterRegion = document.getElementById("filter-region");
-    const filterComuna = document.getElementById("filter-comuna");
-    const filterProfesion = document.getElementById("filter-profesion");
-
-    let currentUser = null;
-    let firstLoad = true;
-    let allPosts = [];
-
-    /* ---------- POBLAR FILTROS ---------- */
-    // Regiones
-    ChileData.getRegionNames().forEach(region => {
-        const option = document.createElement('option');
-        option.value = region;
-        option.textContent = region;
-        filterRegion.appendChild(option);
-    });
-
-    // Profesiones
-    ChileData.subjects.forEach(profesion => {
-        const option = document.createElement('option');
-        option.value = profesion;
-        option.textContent = profesion;
-        filterProfesion.appendChild(option);
-    });
-
-    // Actualizar comunas cuando cambia región
-    filterRegion.addEventListener('change', () => {
-        const region = filterRegion.value;
-        filterComuna.innerHTML = '<option value="">🏘️ Todas las comunas</option>';
-        
-        if (region) {
-            const comunas = ChileData.getComunasByRegion(region);
-            comunas.forEach(comuna => {
-                const option = document.createElement('option');
-                option.value = comuna;
-                option.textContent = comuna;
-                filterComuna.appendChild(option);
-            });
-        }
-        
-        applyFilters();
-    });
-
-    // Aplicar filtros cuando cambien
-    filterComuna.addEventListener('change', applyFilters);
-    filterProfesion.addEventListener('change', applyFilters);
-
-    /* ---------- FUNCIÓN DE FILTRADO ---------- */
-    function applyFilters() {
-        const region = filterRegion.value;
-        const comuna = filterComuna.value;
-        const profesion = filterProfesion.value;
-
-        const filtered = allPosts.filter(post => {
-            const matchRegion = !region || post.region === region;
-            const matchComuna = !comuna || post.comuna === comuna;
-            const matchProfesion = !profesion || post.profesion === profesion;
-            
-            return matchRegion && matchComuna && matchProfesion;
-        });
-
-        renderPosts(filtered);
-    }
-
-    /* ---------- AUTH ---------- */
-    firebase.auth().onAuthStateChanged(user => {
-        currentUser = user;
-
-        if (user) {
-            navButtons.innerHTML = `
-                <a href="post-job.html" class="btn-primary">📝 Publicar Aviso</a>
-                <button onclick="logout()" class="btn-secondary">🚪 Salir</button>
-            `;
-        } else {
-            navButtons.innerHTML = `
-                <a href="login.html" class="btn-primary">🔑 Ingresar</a>
-                <a href="register.html" class="btn-secondary">✨ Registrarse</a>
-            `;
-        }
-    });
-
-    window.logout = function() {
-        firebase.auth().signOut().then(() => location.reload());
-    };
-
-    function showNotification(message, type = 'info') {
-        const div = document.createElement("div");
-        div.className = `notification notification-${type}`;
-        div.textContent = message;
-        notificationContainer.appendChild(div);
-        
-        setTimeout(() => div.classList.add('show'), 10);
-        setTimeout(() => {
-            div.classList.remove('show');
-            setTimeout(() => div.remove(), 300);
-        }, 4000);
-    }
-
-    function isNew(createdAt) {
-        if (!createdAt) return false;
-        const diff = new Date() - createdAt.toDate();
-        return diff < 5 * 60 * 1000;
-    }
-
-    function getTimeRemaining(expiresAt) {
-        const diff = expiresAt.toDate() - new Date();
-        if (diff <= 0) return "Expirado";
-        const h = Math.floor(diff / (1000*60*60));
-        const m = Math.floor((diff % (1000*60*60)) / (1000*60));
-        return `${h}h ${m}m`;
-    }
-
-    window.deletePost = async function(postId) {
-        if (!confirm("¿Eliminar este aviso?")) return;
-        try {
-            await db.collection("posts").doc(postId).delete();
-            showNotification('✅ Aviso eliminado', 'success');
-        } catch (error) {
-            showNotification('❌ Error al eliminar', 'error');
-        }
-    };
-
-    window.showContact = function(email) {
-        showNotification(`📧 Contacto: ${email}`, 'info');
-    };
-
-    /* ---------- RENDERIZAR POSTS ---------- */
-    function renderPosts(posts) {
-        if (posts.length === 0) {
-            postsContainer.innerHTML = `
-                <div class="no-posts">
-                    <p>📭 No hay avisos con estos filtros</p>
-                </div>
-            `;
-            return;
-        }
-
-        postsContainer.innerHTML = posts.map(post => `
-            <div class="post-card">
-                <div class="post-header">
-                    <h3>${post.profesion}</h3>
-                    <span class="post-time ${post.timeRemaining === 'Expirado' ? 'expired' : ''}">
-                        ⏰ ${post.timeRemaining}
-                    </span>
-                </div>
-                
-                <div class="post-body">
-                    <p><strong>👤 Nombre:</strong> ${post.nombre}</p>
-                    <p><strong>📚 Profesión:</strong> ${post.profesion}</p>
-                    <p><strong>📍 Ubicación:</strong> ${post.comuna}, ${post.region}</p>
-                    <p><strong>⏰ Disponibilidad:</strong> ${post.disponibilidad}</p>
-                    
-                    ${currentUser ? `
-                        <div class="post-contact">
-                            <button onclick="showContact('${post.email}')" class="btn-contact">
-                                📧 Ver Contacto
-                            </button>
-                        </div>
-                    ` : `
-                        <div class="post-contact-locked">
-                            <p>🔒 <a href="login.html">Inicia sesión</a> para ver el contacto</p>
-                        </div>
-                    `}
-                    
-                    ${currentUser && currentUser.uid === post.userId ? `
-                        <div class="post-actions">
-                            <button onclick="deletePost('${post.id}')" class="btn-delete">
-                                🗑️ Eliminar mi aviso
-                            </button>
-                        </div>
-                    ` : ''}
-                </div>
-            </div>
-        `).join('');
-    }
-
-    /* ---------- FIRESTORE ---------- */
-    db.collection("posts")
-      .where("expiresAt", ">", firebase.firestore.Timestamp.now())
-      .orderBy("expiresAt", "desc")
-      .onSnapshot(snapshot => {
-
-        if (!firstLoad) {
-            snapshot.docChanges().forEach(change => {
-                if (change.type === "added") {
-                    showNotification('🔔 Nuevo profesor disponible', 'success');
-                }
-            });
-        }
-        firstLoad = false;
-
-        allPosts = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            allPosts.push({
-                id: doc.id,
-                ...data,
-                timeRemaining: getTimeRemaining(data.expiresAt)
-            });
-        });
-
-        applyFilters();
-    });
-
-});
-</script>
+<footer style="margin-top:40px; text-align:center; font-size:14px; color:#555; padding:20px;">
+    <p>© 2026 ClaseHoy - Plataforma de conexión docente.</p>
+    <p>
+        <a href="terminos.html" style="color:#667eea; text-decoration:none;">
+            Términos y Condiciones
+        </a>
+        |
+        Contacto:
+        <a href="mailto:contacto.clasehoy@gmail.com" style="color:#667eea; text-decoration:none;">
+            contacto.clasehoy@gmail.com
+        </a>
+    </p>
+</footer>
 
 </body>
 </html>

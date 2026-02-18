@@ -2,25 +2,80 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - ClaseHoy</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
 <div class="auth-container">
-    <div class="auth-card">
-        <h2>Crear Cuenta</h2>
+    <div class="auth-card" style="max-width: 450px;">
+        <h1 style="color: var(--purple-dark); font-size: 2.5rem; text-align: center; margin-bottom: 10px;">📚 ClaseHoy</h1>
+        <p style="text-align: center; color: var(--gray-600); margin-bottom: 30px;">Crea tu cuenta gratuita</p>
 
-        <div id="error-message" class="hidden" style="color:red;"></div>
+        <div id="error-message" class="error-message" style="display: none; background: #fef2f2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ef4444;"></div>
 
         <form id="register-form">
-            <input type="text" name="nombre" placeholder="Nombre completo" required>
-            <input type="email" name="email" placeholder="Correo electrónico" required>
-            <input type="password" name="password" placeholder="Contraseña (mínimo 6 caracteres)" required>
-            <button type="submit">Registrarme</button>
+            <input 
+                type="text" 
+                name="nombre" 
+                placeholder="👤 Nombre completo" 
+                required
+                autofocus
+            >
+            
+            <input 
+                type="email" 
+                name="email" 
+                placeholder="📧 Correo electrónico" 
+                required
+            >
+            
+            <input 
+                type="password" 
+                name="password" 
+                placeholder="🔑 Contraseña (mínimo 6 caracteres)" 
+                required
+                minlength="6"
+            >
+
+            <!-- CHECKBOX DE TÉRMINOS Y CONDICIONES -->
+            <div style="margin: 20px 0; padding: 15px; background: var(--gray-50); border-radius: 12px; border: 2px solid var(--gray-200);">
+                <label style="display: flex; align-items: start; gap: 12px; cursor: pointer;">
+                    <input 
+                        type="checkbox" 
+                        id="terms-checkbox" 
+                        name="terms" 
+                        required
+                        style="width: 20px; height: 20px; margin-top: 2px; cursor: pointer; flex-shrink: 0;"
+                    >
+                    <span style="font-size: 14px; color: var(--gray-700); line-height: 1.5;">
+                        He leído y acepto los 
+                        <a href="terminos.html" target="_blank" style="color: var(--purple-medium); font-weight: 600; text-decoration: none;">
+                            Términos y Condiciones
+                        </a> 
+                        de uso de ClaseHoy
+                    </span>
+                </label>
+            </div>
+
+            <button type="submit" style="width: 100%; margin-top: 10px;">
+                Crear Cuenta
+            </button>
         </form>
 
-        <p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p>
+        <p style="text-align: center; margin-top: 20px; font-size: 14px;">
+            ¿Ya tienes cuenta? 
+            <a href="login.html" style="color: var(--purple-medium); font-weight: 600; text-decoration: none;">
+                Inicia sesión aquí
+            </a>
+        </p>
+
+        <p style="text-align: center; margin-top: 15px;">
+            <a href="index.html" style="color: var(--gray-600); font-size: 14px; text-decoration: none;">
+                ← Volver al inicio
+            </a>
+        </p>
     </div>
 </div>
 
@@ -29,27 +84,59 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="assets/js/firebase-config.js"></script>
-<script src="assets/js/auth.js"></script>
 
 <script>
 document.getElementById('register-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const errorDiv = document.getElementById('error-message');
-    errorDiv.classList.add('hidden');
+    errorDiv.style.display = 'none';
+    errorDiv.textContent = '';
+
+    // Verificar checkbox de términos
+    const termsCheckbox = document.getElementById('terms-checkbox');
+    if (!termsCheckbox.checked) {
+        errorDiv.textContent = '⚠️ Debes aceptar los Términos y Condiciones para continuar';
+        errorDiv.style.display = 'block';
+        return;
+    }
 
     const formData = new FormData(e.target);
     const nombre = formData.get('nombre');
     const email = formData.get('email');
     const password = formData.get('password');
 
-    const result = await Auth.register(email, password, { nombre });
+    try {
+        // Crear usuario en Firebase Auth
+        const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
 
-    if (result.success) {
+        // Guardar perfil en Firestore
+        await db.collection('users').doc(user.uid).set({
+            nombre: nombre,
+            email: user.email,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            termsAccepted: true,
+            termsAcceptedDate: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // Redirigir a publicar aviso
         window.location.href = "post-job.html";
-    } else {
-        errorDiv.textContent = result.error;
-        errorDiv.classList.remove('hidden');
+
+    } catch (error) {
+        let msg = 'Error al registrarse';
+        if (error.code === 'auth/email-already-in-use') {
+            msg = 'El email ya está registrado';
+        }
+        if (error.code === 'auth/invalid-email') {
+            msg = 'Email inválido';
+        }
+        if (error.code === 'auth/weak-password') {
+            msg = 'La contraseña debe tener al menos 6 caracteres';
+        }
+
+        errorDiv.textContent = msg;
+        errorDiv.style.display = 'block';
     }
 });
 </script>

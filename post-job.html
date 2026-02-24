@@ -9,100 +9,38 @@
 <body>
 
 <div class="auth-container">
-    <div class="auth-card" style="max-width: 600px;">
+    <div class="auth-card" style="max-width: 650px;">
         <h2 style="color: var(--purple-dark); text-align: center; margin-bottom: 10px;">📝 Publicar Aviso</h2>
         <p style="text-align: center; color: var(--gray-600); margin-bottom: 30px;">Tu aviso estará visible por 24 horas</p>
 
         <form id="postForm">
 
-            <input type="text" id="nombre" placeholder="👤 Nombre completo" required>
+            <!-- TIPO DE PUBLICACIÓN -->
+            <div style="margin-bottom: 25px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px;">
+                <label style="color: white; font-weight: 600; display: block; margin-bottom: 15px; font-size: 16px;">
+                    ¿Qué estás publicando?
+                </label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <label class="tipo-card" style="background: white; padding: 20px; border-radius: 12px; cursor: pointer; text-align: center; transition: all 0.3s;">
+                        <input type="radio" name="tipo" value="ofrezco" required style="display: none;">
+                        <div class="tipo-icon" style="font-size: 2.5rem; margin-bottom: 10px;">👋</div>
+                        <div class="tipo-title" style="font-weight: 700; color: var(--purple-dark); margin-bottom: 5px;">OFREZCO</div>
+                        <div class="tipo-subtitle" style="font-size: 13px; color: var(--gray-600);">Soy profesional disponible</div>
+                    </label>
+                    
+                    <label class="tipo-card" style="background: white; padding: 20px; border-radius: 12px; cursor: pointer; text-align: center; transition: all 0.3s;">
+                        <input type="radio" name="tipo" value="busco" required style="display: none;">
+                        <div class="tipo-icon" style="font-size: 2.5rem; margin-bottom: 10px;">🏫</div>
+                        <div class="tipo-title" style="font-weight: 700; color: var(--purple-dark); margin-bottom: 5px;">BUSCO</div>
+                        <div class="tipo-subtitle" style="font-size: 13px; color: var(--gray-600);">Soy institución contratando</div>
+                    </label>
+                </div>
+            </div>
 
-            <!-- PROFESION -->
-            <select id="profesion" required>
-                <option value="">📚 Seleccione profesión o cargo</option>
-                <option>Asistente de Aula</option>
-                <option>Auxiliar de Servicio</option>
-                <option>Bibliotecario/a CRA</option>
-                <option>Coordinador/a Académico/a</option>
-                <option>Coordinador/a de Ciclo</option>
-                <option>Coordinador/a de Convivencia Escolar</option>
-                <option>Coordinador/a PIE</option>
-                <option>Educador/a Diferencial</option>
-                <option>Educadora de Párvulos</option>
-                <option>Encargado/a de Convivencia Escolar</option>
-                <option>Encargado/a de Informática Educativa</option>
-                <option>Encargado/a de Laboratorio</option>
-                <option>Encargado/a de Talleres Extraprogramáticos</option>
-                <option>Fonoaudiólogo/a Educacional</option>
-                <option>Inspector/a de Patio</option>
-                <option>Instructor/a de Especialidad TP</option>
-                <option>Kinesiólogo/a Educacional</option>
-                <option>Maestro/a Guía de Especialidad</option>
-                <option>Monitor/a Deportivo/a</option>
-                <option>Orientador/a Educacional</option>
-                <option>Paradocente</option>
-                <option>Profesor/a de Alemán</option>
-                <option>Profesor/a de Artes Escénicas</option>
-                <option>Profesor/a de Artes Visuales</option>
-                <option>Profesor/a de Biología</option>
-                <option>Profesor/a de Ciencias Naturales</option>
-                <option>Profesor/a de Educación Básica General</option>
-                <option>Profesor/a de Educación Física y Salud</option>
-                <option>Profesor/a de Filosofía</option>
-                <option>Profesor/a de Física</option>
-                <option>Profesor/a de Francés</option>
-                <option>Profesor/a de Historia y Ciencias Sociales</option>
-                <option>Profesor/a de Inglés</option>
-                <option>Profesor/a de Lenguaje y Comunicación</option>
-                <option>Profesor/a de Matemática</option>
-                <option>Profesor/a de Música</option>
-                <option>Profesor/a de Química</option>
-                <option>Profesor/a de Religión</option>
-                <option>Profesor/a de Tecnología</option>
-                <option>Profesor/a Técnico Profesional</option>
-                <option>Psicólogo/a Educacional</option>
-                <option>Psicopedagogo/a</option>
-                <option>Terapeuta Ocupacional</option>
-                <option>Técnico en Educación Especial</option>
-                <option>Técnico en Educación Parvularia</option>
-                <option>Trabajador/a Social</option>
-                <option>Otro (especificar en contacto)</option>
-            </select>
+            <!-- CAMPOS DINÁMICOS -->
+            <div id="campos-dinamicos"></div>
 
-            <!-- REGION -->
-            <select id="region" required>
-                <option value="">📍 Seleccione Región</option>
-                <option>Arica y Parinacota</option>
-                <option>Tarapacá</option>
-                <option>Antofagasta</option>
-                <option>Atacama</option>
-                <option>Coquimbo</option>
-                <option>Valparaíso</option>
-                <option>Metropolitana de Santiago</option>
-                <option>Libertador General Bernardo O'Higgins</option>
-                <option>Maule</option>
-                <option>Ñuble</option>
-                <option>Biobío</option>
-                <option>La Araucanía</option>
-                <option>Los Ríos</option>
-                <option>Los Lagos</option>
-                <option>Aysén del General Carlos Ibáñez del Campo</option>
-                <option>Magallanes y de la Antártica Chilena</option>
-            </select>
-
-            <!-- COMUNA -->
-            <select id="comuna" required>
-                <option value="">🏘️ Seleccione Comuna</option>
-            </select>
-
-            <!-- DISPONIBILIDAD -->
-            <select id="disponibilidad" required>
-                <option value="">⏰ Disponibilidad</option>
-                <option>Disponible inmediato</option>
-                <option>Completando horario</option>
-            </select>
-
-            <!-- CHECKBOX DE TÉRMINOS Y CONDICIONES -->
+            <!-- CHECKBOX DE TÉRMINOS -->
             <div style="margin: 20px 0; padding: 15px; background: #fff3cd; border-radius: 12px; border: 2px solid #ffc107;">
                 <label style="display: flex; align-items: start; gap: 12px; cursor: pointer;">
                     <input 
@@ -143,48 +81,119 @@
 <script src="assets/js/chile-data.js"></script>
 
 <script>
-
 document.addEventListener("DOMContentLoaded", () => {
 
     const form = document.getElementById("postForm");
     const message = document.getElementById("message");
-
-    const regionSelect = document.getElementById("region");
-    const comunaSelect = document.getElementById("comuna");
-
-    // Mapa simplificado de comunas principales (se puede expandir con chile-data.js)
-    const comunasPorRegion = {
-        "Arica y Parinacota": ["Arica", "Camarones", "Putre", "General Lagos"],
-        "Tarapacá": ["Iquique", "Alto Hospicio", "Pozo Almonte", "Camiña", "Colchane", "Huara", "Pica"],
-        "Antofagasta": ["Antofagasta", "Mejillones", "Sierra Gorda", "Taltal", "Calama", "Ollagüe", "San Pedro de Atacama", "Tocopilla", "María Elena"],
-        "Atacama": ["Copiapó", "Caldera", "Tierra Amarilla", "Chañaral", "Diego de Almagro", "Vallenar", "Alto del Carmen", "Freirina", "Huasco"],
-        "Coquimbo": ["La Serena", "Coquimbo", "Andacollo", "La Higuera", "Paiguano", "Vicuña", "Illapel", "Canela", "Los Vilos", "Salamanca", "Ovalle", "Combarbalá", "Monte Patria", "Punitaqui", "Río Hurtado"],
-        "Valparaíso": ["Valparaíso", "Casablanca", "Concón", "Juan Fernández", "Puchuncaví", "Quintero", "Viña del Mar", "Isla de Pascua", "Los Andes", "Calle Larga", "Rinconada", "San Esteban", "La Ligua", "Cabildo", "Papudo", "Petorca", "Zapallar", "Quillota", "Calera", "Hijuelas", "La Cruz", "Nogales", "San Antonio", "Algarrobo", "Cartagena", "El Quisco", "El Tabo", "Santo Domingo", "San Felipe", "Catemu", "Llaillay", "Panquehue", "Putaendo", "Santa María", "Quilpué", "Limache", "Olmué", "Villa Alemana"],
-        "Metropolitana de Santiago": ["Santiago", "Cerrillos", "Cerro Navia", "Conchalí", "El Bosque", "Estación Central", "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja", "La Pintana", "La Reina", "Las Condes", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú", "Ñuñoa", "Pedro Aguirre Cerda", "Peñalolén", "Providencia", "Pudahuel", "Quilicura", "Quinta Normal", "Recoleta", "Renca", "San Joaquín", "San Miguel", "San Ramón", "Vitacura", "Puente Alto", "Pirque", "San José de Maipo", "Colina", "Lampa", "Tiltil", "San Bernardo", "Buin", "Calera de Tango", "Paine", "Melipilla", "Alhué", "Curacaví", "María Pinto", "San Pedro", "Talagante", "El Monte", "Isla de Maipo", "Padre Hurtado", "Peñaflor"],
-        "Libertador General Bernardo O'Higgins": ["Rancagua", "Codegua", "Coinco", "Coltauco", "Doñihue", "Graneros", "Las Cabras", "Machalí", "Malloa", "Mostazal", "Olivar", "Peumo", "Pichidegua", "Quinta de Tilcoco", "Rengo", "Requínoa", "San Vicente", "Pichilemu", "La Estrella", "Litueche", "Marchihue", "Navidad", "Paredones", "San Fernando", "Chépica", "Chimbarongo", "Lolol", "Nancagua", "Palmilla", "Peralillo", "Placilla", "Pumanque", "Santa Cruz"],
-        "Maule": ["Talca", "Constitución", "Curepto", "Empedrado", "Maule", "Pelarco", "Pencahue", "Río Claro", "San Clemente", "San Rafael", "Cauquenes", "Chanco", "Pelluhue", "Curicó", "Hualañé", "Licantén", "Molina", "Rauco", "Romeral", "Sagrada Familia", "Teno", "Vichuquén", "Linares", "Colbún", "Longaví", "Parral", "Retiro", "San Javier", "Villa Alegre", "Yerbas Buenas"],
-        "Ñuble": ["Chillán", "Bulnes", "Chillán Viejo", "El Carmen", "Pemuco", "Pinto", "Quillón", "San Ignacio", "Yungay", "Quirihue", "Cobquecura", "Coelemu", "Ninhue", "Portezuelo", "Ranquil", "Treguaco", "San Carlos", "Coihueco", "Ñiquén", "San Fabián", "San Nicolás"],
-        "Biobío": ["Concepción", "Coronel", "Chiguayante", "Florida", "Hualqui", "Lota", "Penco", "San Pedro de la Paz", "Santa Juana", "Talcahuano", "Tomé", "Hualpén", "Lebu", "Arauco", "Cañete", "Contulmo", "Curanilahue", "Los Álamos", "Tirúa", "Los Ángeles", "Antuco", "Cabrero", "Laja", "Mulchén", "Nacimiento", "Negrete", "Quilaco", "Quilleco", "San Rosendo", "Santa Bárbara", "Tucapel", "Yumbel", "Alto Biobío"],
-        "La Araucanía": ["Temuco", "Carahue", "Cunco", "Curarrehue", "Freire", "Galvarino", "Gorbea", "Lautaro", "Loncoche", "Melipeuco", "Nueva Imperial", "Padre Las Casas", "Perquenco", "Pitrufquén", "Pucón", "Saavedra", "Teodoro Schmidt", "Toltén", "Vilcún", "Villarrica", "Cholchol", "Angol", "Collipulli", "Curacautín", "Ercilla", "Lonquimay", "Los Sauces", "Lumaco", "Purén", "Renaico", "Traiguén", "Victoria"],
-        "Los Ríos": ["Valdivia", "Corral", "Lanco", "Los Lagos", "Máfil", "Mariquina", "Paillaco", "Panguipulli", "La Unión", "Futrono", "Lago Ranco", "Río Bueno"],
-        "Los Lagos": ["Puerto Montt", "Calbuco", "Cochamó", "Fresia", "Frutillar", "Los Muermos", "Llanquihue", "Maullín", "Puerto Varas", "Castro", "Ancud", "Chonchi", "Curaco de Vélez", "Dalcahue", "Puqueldón", "Queilén", "Quellón", "Quemchi", "Quinchao", "Osorno", "Puerto Octay", "Purranque", "Puyehue", "Río Negro", "San Juan de la Costa", "San Pablo", "Chaitén", "Futaleufú", "Hualaihué", "Palena"],
-        "Aysén del General Carlos Ibáñez del Campo": ["Coyhaique", "Lago Verde", "Aysén", "Cisnes", "Guaitecas", "Cochrane", "O'Higgins", "Tortel", "Chile Chico", "Río Ibáñez"],
-        "Magallanes y de la Antártica Chilena": ["Punta Arenas", "Laguna Blanca", "Río Verde", "San Gregorio", "Cabo de Hornos", "Antártica", "Porvenir", "Primavera", "Timaukel", "Natales", "Torres del Paine"]
-    };
-
-    regionSelect.addEventListener("change", () => {
-        const region = regionSelect.value;
-        comunaSelect.innerHTML = '<option value="">🏘️ Seleccione Comuna</option>';
-
-        if (comunasPorRegion[region]) {
-            comunasPorRegion[region].forEach(comuna => {
-                const option = document.createElement("option");
-                option.value = comuna;
-                option.textContent = comuna;
-                comunaSelect.appendChild(option);
-            });
+    const camposDinamicos = document.getElementById("campos-dinamicos");
+    
+    // Estilos para las cards seleccionadas
+    const style = document.createElement('style');
+    style.textContent = `
+        .tipo-card input:checked + .tipo-icon { transform: scale(1.2); }
+        .tipo-card:has(input:checked) {
+            border: 3px solid var(--purple-medium) !important;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
+        .tipo-card:hover { transform: translateY(-4px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+    `;
+    document.head.appendChild(style);
+
+    // Escuchar cambios en tipo de publicación
+    document.querySelectorAll('input[name="tipo"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            mostrarCampos(e.target.value);
+        });
     });
+
+    function mostrarCampos(tipo) {
+        if (tipo === 'ofrezco') {
+            camposDinamicos.innerHTML = `
+                <input type="text" id="nombre" placeholder="👤 Tu nombre completo" required>
+
+                <select id="profesion" required>
+                    <option value="">📚 Tu profesión o cargo</option>
+                    ${ChileData.subjects.map(p => `<option>${p}</option>`).join('')}
+                </select>
+
+                <select id="region" required>
+                    <option value="">📍 Región donde ofreces tus servicios</option>
+                    ${ChileData.getRegionNames().map(r => `<option>${r}</option>`).join('')}
+                </select>
+
+                <select id="comuna" required>
+                    <option value="">🏘️ Seleccione Comuna</option>
+                </select>
+
+                <select id="disponibilidad" required>
+                    <option value="">⏰ Tu disponibilidad</option>
+                    <option>Disponible inmediato</option>
+                    <option>A partir de la próxima semana</option>
+                    <option>Completando horario</option>
+                    <option>Fines de semana</option>
+                    <option>Media jornada</option>
+                    <option>Jornada completa</option>
+                </select>
+
+                <textarea id="descripcion" placeholder="✍️ Describe brevemente tu experiencia (opcional)" rows="3" style="width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--gray-200); font-size: 15px; font-family: inherit; resize: vertical;"></textarea>
+            `;
+        } else {
+            camposDinamicos.innerHTML = `
+                <input type="text" id="nombre" placeholder="🏫 Nombre de la institución" required>
+
+                <select id="profesion" required>
+                    <option value="">📚 Profesión o cargo que buscas</option>
+                    ${ChileData.subjects.map(p => `<option>${p}</option>`).join('')}
+                </select>
+
+                <select id="region" required>
+                    <option value="">📍 Región de la institución</option>
+                    ${ChileData.getRegionNames().map(r => `<option>${r}</option>`).join('')}
+                </select>
+
+                <select id="comuna" required>
+                    <option value="">🏘️ Seleccione Comuna</option>
+                </select>
+
+                <select id="disponibilidad" required>
+                    <option value="">⏰ Tipo de contratación</option>
+                    <option>Reemplazo inmediato</option>
+                    <option>Contrato indefinido</option>
+                    <option>Contrato a plazo fijo</option>
+                    <option>Media jornada</option>
+                    <option>Jornada completa</option>
+                    <option>Por horas</option>
+                </select>
+
+                <textarea id="descripcion" placeholder="✍️ Describe el puesto y requisitos (opcional)" rows="3" style="width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--gray-200); font-size: 15px; font-family: inherit; resize: vertical;"></textarea>
+            `;
+        }
+
+        // Re-activar listener de regiones
+        setupRegionListener();
+    }
+
+    function setupRegionListener() {
+        const regionSelect = document.getElementById("region");
+        const comunaSelect = document.getElementById("comuna");
+
+        if (!regionSelect || !comunaSelect) return;
+
+        regionSelect.addEventListener("change", () => {
+            const region = regionSelect.value;
+            comunaSelect.innerHTML = '<option value="">🏘️ Seleccione Comuna</option>';
+
+            if (region) {
+                const comunas = ChileData.getComunasByRegion(region);
+                comunas.forEach(comuna => {
+                    const option = document.createElement("option");
+                    option.value = comuna;
+                    option.textContent = comuna;
+                    comunaSelect.appendChild(option);
+                });
+            }
+        });
+    }
 
     firebase.auth().onAuthStateChanged(user => {
 
@@ -196,7 +205,6 @@ document.addEventListener("DOMContentLoaded", () => {
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            // Verificar checkbox de términos
             const termsCheckbox = document.getElementById('terms-checkbox-post');
             if (!termsCheckbox.checked) {
                 message.style.color = "red";
@@ -204,11 +212,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            const tipo = document.querySelector('input[name="tipo"]:checked')?.value;
+            if (!tipo) {
+                message.style.color = "red";
+                message.innerText = "⚠️ Selecciona si OFRECES o BUSCAS";
+                return;
+            }
+
             const nombre = document.getElementById("nombre").value;
             const profesion = document.getElementById("profesion").value;
-            const region = regionSelect.value;
-            const comuna = comunaSelect.value;
+            const region = document.getElementById("region").value;
+            const comuna = document.getElementById("comuna").value;
             const disponibilidad = document.getElementById("disponibilidad").value;
+            const descripcion = document.getElementById("descripcion")?.value || "";
 
             const now = new Date();
             const expires = new Date(now.getTime() + 24 * 60 * 60 * 1000);
@@ -228,11 +244,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 await db.collection("posts").add({
                     userId: user.uid,
+                    tipo: tipo,
                     nombre,
                     profesion,
                     region,
                     comuna,
                     disponibilidad,
+                    descripcion,
                     email: user.email,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     expiresAt: firebase.firestore.Timestamp.fromDate(expires)

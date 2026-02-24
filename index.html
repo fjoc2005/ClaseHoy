@@ -19,6 +19,12 @@
 
     <!-- FILTROS -->
     <div class="filters">
+        <select id="filter-tipo">
+            <option value="">🔄 Todo (Ofrezco y Busco)</option>
+            <option value="ofrezco">👋 Solo OFREZCO</option>
+            <option value="busco">🏫 Solo BUSCO</option>
+        </select>
+
         <select id="filter-region">
             <option value="">🌎 Todas las regiones</option>
         </select>
@@ -55,6 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const postsContainer = document.getElementById("posts-container");
     const navButtons = document.getElementById("nav-buttons");
     const notificationContainer = document.getElementById("notification-container");
+    const filterTipo = document.getElementById("filter-tipo");
     const filterRegion = document.getElementById("filter-region");
     const filterComuna = document.getElementById("filter-comuna");
     const filterProfesion = document.getElementById("filter-profesion");
@@ -111,23 +118,26 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Aplicar filtros cuando cambien
+    filterTipo.addEventListener('change', applyFilters);
     filterComuna.addEventListener('change', applyFilters);
     filterProfesion.addEventListener('change', applyFilters);
 
     /* ---------- FUNCIÓN DE FILTRADO ---------- */
     function applyFilters() {
+        const tipo = filterTipo.value;
         const region = filterRegion.value;
         const comuna = filterComuna.value;
         const profesion = filterProfesion.value;
 
-        console.log('Filtros aplicados:', { region, comuna, profesion });
+        console.log('Filtros aplicados:', { tipo, region, comuna, profesion });
 
         const filtered = allPosts.filter(post => {
+            const matchTipo = !tipo || post.tipo === tipo;
             const matchRegion = !region || post.region === region;
             const matchComuna = !comuna || post.comuna === comuna;
             const matchProfesion = !profesion || post.profesion === profesion;
             
-            return matchRegion && matchComuna && matchProfesion;
+            return matchTipo && matchRegion && matchComuna && matchProfesion;
         });
 
         console.log('Posts filtrados:', filtered.length, 'de', allPosts.length);
@@ -207,43 +217,55 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        postsContainer.innerHTML = posts.map(post => `
-            <div class="post-card">
-                <div class="post-header">
-                    <h3>${post.profesion}</h3>
-                    <span class="post-time ${post.timeRemaining === 'Expirado' ? 'expired' : ''}">
-                        ⏰ ${post.timeRemaining}
-                    </span>
-                </div>
-                
-                <div class="post-body">
-                    <p><strong>👤 Nombre:</strong> ${post.nombre}</p>
-                    <p><strong>📚 Profesión:</strong> ${post.profesion}</p>
-                    <p><strong>📍 Ubicación:</strong> ${post.comuna}, ${post.region}</p>
-                    <p><strong>⏰ Disponibilidad:</strong> ${post.disponibilidad}</p>
+        postsContainer.innerHTML = posts.map(post => {
+            const tipoBadge = post.tipo === 'ofrezco' 
+                ? '<span style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;">👋 OFREZCO</span>'
+                : '<span style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;">🏫 BUSCO</span>';
+            
+            const tipoTexto = post.tipo === 'ofrezco' ? 'Profesional' : 'Institución';
+            
+            return `
+                <div class="post-card">
+                    <div class="post-header">
+                        <div>
+                            ${tipoBadge}
+                            <h3 style="margin-top: 10px;">${post.profesion}</h3>
+                        </div>
+                        <span class="post-time ${post.timeRemaining === 'Expirado' ? 'expired' : ''}">
+                            ⏰ ${post.timeRemaining}
+                        </span>
+                    </div>
                     
-                    ${currentUser ? `
-                        <div class="post-contact">
-                            <button onclick="showContact('${post.email}')" class="btn-contact">
-                                📧 Ver Contacto
-                            </button>
-                        </div>
-                    ` : `
-                        <div class="post-contact-locked">
-                            <p>🔒 <a href="login.html">Inicia sesión</a> para ver el contacto</p>
-                        </div>
-                    `}
-                    
-                    ${currentUser && currentUser.uid === post.userId ? `
-                        <div class="post-actions">
-                            <button onclick="deletePost('${post.id}')" class="btn-delete">
-                                🗑️ Eliminar mi aviso
-                            </button>
-                        </div>
-                    ` : ''}
+                    <div class="post-body">
+                        <p><strong>${post.tipo === 'ofrezco' ? '👤' : '🏫'} ${tipoTexto}:</strong> ${post.nombre}</p>
+                        <p><strong>📚 ${post.tipo === 'ofrezco' ? 'Profesión' : 'Busca'}:</strong> ${post.profesion}</p>
+                        <p><strong>📍 Ubicación:</strong> ${post.comuna}, ${post.region}</p>
+                        <p><strong>⏰ ${post.tipo === 'ofrezco' ? 'Disponibilidad' : 'Tipo'}:</strong> ${post.disponibilidad}</p>
+                        ${post.descripcion ? `<p style="margin-top: 10px; padding: 10px; background: #f9fafb; border-radius: 8px; font-size: 13px; color: #4b5563;"><strong>📝 Info:</strong> ${post.descripcion}</p>` : ''}
+                        
+                        ${currentUser ? `
+                            <div class="post-contact">
+                                <button onclick="showContact('${post.email}')" class="btn-contact">
+                                    📧 Ver Contacto
+                                </button>
+                            </div>
+                        ` : `
+                            <div class="post-contact-locked">
+                                <p>🔒 <a href="login.html">Inicia sesión</a> para ver el contacto</p>
+                            </div>
+                        `}
+                        
+                        ${currentUser && currentUser.uid === post.userId ? `
+                            <div class="post-actions">
+                                <button onclick="deletePost('${post.id}')" class="btn-delete">
+                                    🗑️ Eliminar mi aviso
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     /* ---------- FIRESTORE ---------- */

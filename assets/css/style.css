@@ -1,22 +1,33 @@
 :root {
-    /* COLORES MODERNOS EN TENDENCIA 2024-2025 */
-    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --green-gradient: linear-gradient(135deg, #06b6d4 0%, #10b981 100%);
+    /* PALETA DE COLORES MODERNA PARA FONDO BLANCO */
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-light: #818cf8;
+    
+    --green: #10b981;
+    --green-dark: #059669;
+    --green-light: #34d399;
+    
+    --blue: #3b82f6;
+    --blue-dark: #2563eb;
+    --blue-light: #60a5fa;
+    
+    --purple: #a855f7;
+    --purple-dark: #9333ea;
+    --purple-light: #c084fc;
+    
+    --orange: #f97316;
+    --orange-dark: #ea580c;
+    --orange-light: #fb923c;
+    
+    /* Gradientes */
+    --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    --green-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
     --blue-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
     --purple-gradient: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
     --orange-gradient: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
     
-    --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    
-    --purple-dark: #5b21b6;
-    --purple-medium: #7c3aed;
-    --purple-light: #a78bfa;
-    --blue-bright: #3b82f6;
-    --pink-bright: #ec4899;
-    --orange-bright: #f97316;
-    --cyan-bright: #06b6d4;
-    --green-bright: #10b981;
-    
+    /* Grises y fondos */
     --white: #ffffff;
     --gray-50: #f9fafb;
     --gray-100: #f3f4f6;
@@ -24,13 +35,16 @@
     --gray-300: #d1d5db;
     --gray-400: #9ca3af;
     --gray-500: #6b7280;
+    --gray-600: #4b5563;
     --gray-700: #374151;
+    --gray-800: #1f2937;
     --gray-900: #111827;
     
-    --text: #1e293b;
-    --text-muted: #64748b;
-    --border: #e2e8f0;
+    --text: #1f2937;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
     
+    /* Sombras */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -46,20 +60,14 @@
 }
 
 body {
-    background: var(--bg-gradient);
-    background-attachment: fixed;
+    background: var(--white);
     color: var(--text);
     min-height: 100vh;
     padding: 20px;
-    animation: gradientShift 15s ease infinite;
+    line-height: 1.6;
 }
 
-@keyframes gradientShift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-}
-
-/* HEADER CON ANIMACIÓN */
+/* HEADER CON LOGO */
 .header {
     text-align: center;
     padding: 20px 0 30px 0;
@@ -72,31 +80,24 @@ body {
     animation: fadeInDown 0.6s ease;
 }
 
-.main-header h1 {
-    color: white;
-    font-size: 4rem;
-    font-weight: 900;
-    margin-bottom: 15px;
-    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    letter-spacing: -2px;
-    animation: titleBounce 2s ease-in-out infinite;
-    background: linear-gradient(45deg, #fff, #f0f0f0, #fff);
-    background-size: 200% 200%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.main-header img {
+    max-width: 220px;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08));
+    transition: transform 0.3s ease;
 }
 
-@keyframes titleBounce {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+.main-header img:hover {
+    transform: scale(1.05);
 }
 
 .main-header p {
-    color: rgba(255, 255, 255, 0.95);
-    font-size: 1.3rem;
+    color: var(--gray-700);
+    font-size: 1.2rem;
     font-weight: 600;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    margin-top: 15px;
     animation: fadeIn 1s ease 0.3s both;
 }
 
@@ -107,7 +108,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(10px);
     z-index: 10000;
     display: flex;
@@ -171,7 +172,7 @@ body {
 }
 
 .welcome-content .feature-text h3 {
-    color: var(--purple-dark);
+    color: var(--primary-dark);
     margin-bottom: 5px;
     font-size: 1.1rem;
 }
@@ -194,12 +195,12 @@ body {
     cursor: pointer;
     margin-top: 30px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
 }
 
 .btn-close-welcome:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.5);
 }
 
 /* CONTENEDOR PRINCIPAL */
@@ -216,7 +217,8 @@ body {
     max-width: 1200px;
     padding: 35px;
     border-radius: 24px;
-    box-shadow: var(--shadow-xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
     animation: fadeInUp 0.6s ease;
 }
 
@@ -247,18 +249,18 @@ body {
 .btn-primary {
     background: var(--primary-gradient);
     color: white;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
 }
 
 .btn-secondary {
     background: var(--gray-100);
     color: var(--gray-700);
-    border: 2px solid var(--gray-200);
+    border: 2px solid var(--gray-300);
 }
 
 .btn-secondary:hover {
@@ -273,19 +275,19 @@ body {
     gap: 15px;
     margin-bottom: 30px;
     padding: 25px;
-    background: var(--primary-gradient);
+    background: var(--gray-50);
     border-radius: 16px;
     animation: fadeIn 0.8s ease;
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+    border: 2px solid var(--gray-200);
 }
 
 .filters select {
     padding: 14px 16px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: 2px solid var(--gray-300);
     border-radius: 12px;
     font-size: 14px;
     font-weight: 500;
-    background: rgba(255, 255, 255, 0.95);
+    background: white;
     cursor: pointer;
     transition: all 0.3s ease;
     color: var(--gray-700);
@@ -293,18 +295,16 @@ body {
 
 .filters select:focus {
     outline: none;
-    border-color: white;
-    background: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
     transform: translateY(-2px);
 }
 
 .filters select:hover {
-    background: white;
-    border-color: rgba(255, 255, 255, 0.6);
+    border-color: var(--primary-light);
 }
 
-/* CONTENEDOR DE POSTS - FEED STYLE */
+/* CONTENEDOR DE POSTS */
 #posts-container {
     display: flex;
     flex-direction: column;
@@ -313,12 +313,12 @@ body {
     margin: 0 auto;
 }
 
-/* TARJETA DE POST CON COLORES POR TIPO */
+/* TARJETA DE POST */
 .post-card {
     background: white;
     border-radius: 20px;
     padding: 25px;
-    border: 2px solid var(--gray-100);
+    border: 2px solid var(--gray-200);
     transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     position: relative;
     overflow: hidden;
@@ -354,10 +354,11 @@ body {
 
 .post-card:hover {
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    border-color: var(--primary-light);
 }
 
-/* BADGES CON COLORES MODERNOS */
+/* BADGES */
 .badge-tipo {
     display: inline-flex;
     align-items: center;
@@ -369,12 +370,6 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 15px;
-    animation: badgePulse 2s ease-in-out infinite;
-}
-
-@keyframes badgePulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
 }
 
 .badge-ofrezco {
@@ -428,8 +423,8 @@ body {
 }
 
 .post-time.expired {
-    background: var(--gray-200);
-    color: var(--gray-500);
+    background: var(--gray-300);
+    color: var(--gray-600);
     box-shadow: none;
 }
 
@@ -514,7 +509,7 @@ body {
 .post-contact-locked {
     margin-top: 15px;
     padding: 14px;
-    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    background: var(--gray-50);
     border-radius: 12px;
     text-align: center;
     border: 2px dashed var(--gray-300);
@@ -528,26 +523,67 @@ body {
 }
 
 .post-contact-locked a {
-    color: var(--purple-medium);
+    color: var(--primary);
     font-weight: 700;
     text-decoration: none;
     transition: color 0.2s ease;
 }
 
 .post-contact-locked a:hover {
-    color: var(--purple-dark);
+    color: var(--primary-dark);
     text-decoration: underline;
 }
 
-/* NO POSTS */
+/* MENSAJE MOTIVACIONAL CUANDO NO HAY POSTS */
 .no-posts {
     text-align: center;
     padding: 80px 20px;
-    color: var(--gray-400);
-    font-size: 18px;
-    background: var(--gray-50);
+    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
     border-radius: 20px;
-    border: 2px dashed var(--gray-200);
+    border: 2px dashed var(--gray-300);
+}
+
+.no-posts-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+.no-posts h3 {
+    color: var(--gray-800);
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.no-posts p {
+    color: var(--gray-600);
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.no-posts .btn-cta {
+    display: inline-block;
+    padding: 16px 32px;
+    background: var(--primary-gradient);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    transition: all 0.3s ease;
+}
+
+.no-posts .btn-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
 }
 
 /* NOTIFICACIONES */
@@ -570,7 +606,7 @@ body {
     transform: translateX(450px);
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    border-left: 4px solid var(--purple-medium);
+    border-left: 4px solid var(--primary);
     font-weight: 500;
     font-size: 14px;
 }
@@ -581,7 +617,7 @@ body {
 }
 
 .notification-success {
-    border-left-color: #10b981;
+    border-left-color: var(--green);
     background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
     color: #065f46;
 }
@@ -593,7 +629,7 @@ body {
 }
 
 .notification-info {
-    border-left-color: var(--blue-bright);
+    border-left-color: var(--blue);
     background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
     color: #1e40af;
 }
@@ -604,17 +640,18 @@ input, select, textarea {
     padding: 14px 16px;
     margin-bottom: 16px;
     border-radius: 12px;
-    border: 2px solid var(--gray-200);
+    border: 2px solid var(--gray-300);
     font-size: 15px;
     transition: all 0.3s ease;
     font-weight: 500;
     font-family: inherit;
+    background: white;
 }
 
 input:focus, select:focus, textarea:focus {
     outline: none;
-    border-color: var(--purple-medium);
-    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
     transform: translateY(-2px);
 }
 
@@ -630,12 +667,39 @@ button[type="submit"] {
     font-size: 16px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 button[type="submit"]:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+}
+
+/* CARDS DE TIPO EN FORMULARIO */
+.tipo-card {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border: 3px solid var(--gray-200);
+}
+
+.tipo-card:hover {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    border-color: var(--primary-light);
+}
+
+.tipo-card input:checked ~ * {
+    transform: scale(1.1);
+}
+
+.tipo-card:has(input:checked) {
+    border-color: var(--primary);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
 }
 
 /* ANIMACIONES */
@@ -677,44 +741,19 @@ button[type="submit"]:hover {
     }
 }
 
-/* CARDS DE TIPO EN FORMULARIO */
-.tipo-card {
-    background: white;
-    padding: 25px;
-    border-radius: 16px;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    border: 3px solid transparent;
-}
-
-.tipo-card:hover {
-    transform: translateY(-8px) scale(1.05);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-}
-
-.tipo-card input:checked ~ * {
-    transform: scale(1.1);
-}
-
-.tipo-card:has(input:checked) {
-    border-color: var(--purple-medium);
-    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
-    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
-}
-
-/* RESPONSIVE */
+/* RESPONSIVE OPTIMIZADO PARA MÓVILES */
 @media (max-width: 768px) {
     body {
         padding: 10px;
     }
     
-    .main-header h1 {
-        font-size: 2.5rem;
+    .main-header img {
+        max-width: 160px;
     }
     
     .main-header p {
         font-size: 1rem;
+        padding: 0 10px;
     }
     
     .auth-card {
@@ -724,12 +763,17 @@ button[type="submit"]:hover {
     
     .filters {
         grid-template-columns: 1fr;
-        padding: 20px;
+        padding: 15px;
+        gap: 12px;
     }
     
     .post-header {
         flex-direction: column;
         align-items: flex-start;
+    }
+    
+    .post-time {
+        align-self: flex-start;
     }
     
     #notification-container {
@@ -739,17 +783,11 @@ button[type="submit"]:hover {
     }
     
     .welcome-content {
-        padding: 30px 20px;
+        padding: 25px 20px;
     }
     
     .welcome-content h2 {
-        font-size: 2rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .main-header h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
     
     #nav-buttons {
@@ -760,5 +798,40 @@ button[type="submit"]:hover {
     #nav-buttons button {
         width: 100%;
         justify-content: center;
+    }
+    
+    .no-posts {
+        padding: 60px 20px;
+    }
+    
+    .no-posts-icon {
+        font-size: 3rem;
+    }
+    
+    .no-posts h3 {
+        font-size: 1.4rem;
+    }
+    
+    .no-posts p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-header img {
+        max-width: 140px;
+    }
+    
+    .post-card {
+        padding: 20px;
+    }
+    
+    .post-header h3 {
+        font-size: 1.2rem;
+    }
+    
+    .badge-tipo {
+        font-size: 11px;
+        padding: 6px 12px;
     }
 }

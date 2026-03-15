@@ -48,8 +48,7 @@
 </div>
 
 <div class="main-header">
-    <img src="assets/images/logo.png" alt="ClaseHoy Logo" style="max-width: 180px; margin: 0 auto 20px; display: block;">
-    <h1>ClaseHoy</h1>
+    <img src="assets/images/logo.png" alt="ClaseHoy - Plataforma de empleos educativos">
     <p>La plataforma colaborativa de empleos educativa más grande de Chile</p>
 </div>
 
@@ -254,9 +253,17 @@ document.addEventListener("DOMContentLoaded", () => {
     /* ---------- RENDERIZAR POSTS ---------- */
     function renderPosts(posts) {
         if (posts.length === 0) {
+            const isLoggedIn = currentUser !== null;
             postsContainer.innerHTML = `
                 <div class="no-posts">
-                    <p>📭 No hay avisos con estos filtros</p>
+                    <div class="no-posts-icon">🚀</div>
+                    <h3>¡Sé el primero en publicar!</h3>
+                    <p>No hay avisos con estos filtros. ¿Por qué no ${isLoggedIn ? 'publicas' : 'te registras y publicas'} el primero?<br>
+                    Conecta con profesionales y oportunidades educativas.</p>
+                    ${isLoggedIn 
+                        ? '<a href="post-job.html" class="btn-cta">📝 Publicar Aviso Ahora</a>'
+                        : '<a href="register.html" class="btn-cta">✨ Registrarse Gratis</a>'
+                    }
                 </div>
             `;
             return;

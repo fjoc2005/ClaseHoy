@@ -16,11 +16,11 @@
         <form id="postForm">
 
             <!-- TIPO DE PUBLICACIÓN -->
-            <div style="margin-bottom: 30px; padding: 25px; background: var(--primary-gradient); border-radius: 16px;">
+            <div id="tipo-container" style="margin-bottom: 30px; padding: 25px; background: var(--primary-gradient); border-radius: 16px;">
                 <label style="color: white; font-weight: 700; display: block; margin-bottom: 20px; font-size: 17px; text-align: center;">
                     ¿Qué estás publicando?
                 </label>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                <div id="tipo-options" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
                     <label class="tipo-card">
                         <input type="radio" name="tipo" value="ofrezco" required style="display: none;">
                         <div class="tipo-icon" style="font-size: 3rem; margin-bottom: 10px;">👋</div>
@@ -33,13 +33,6 @@
                         <div class="tipo-icon" style="font-size: 3rem; margin-bottom: 10px;">🏫</div>
                         <div class="tipo-title" style="font-weight: 700; color: var(--purple-dark); margin-bottom: 5px; font-size: 15px;">BUSCO</div>
                         <div class="tipo-subtitle" style="font-size: 12px; color: var(--gray-600);">Soy institución</div>
-                    </label>
-
-                    <label class="tipo-card">
-                        <input type="radio" name="tipo" value="oportunidad" required style="display: none;">
-                        <div class="tipo-icon" style="font-size: 3rem; margin-bottom: 10px;">🔍</div>
-                        <div class="tipo-title" style="font-weight: 700; color: var(--purple-dark); margin-bottom: 5px; font-size: 15px;">OPORTUNIDAD</div>
-                        <div class="tipo-subtitle" style="font-size: 12px; color: var(--gray-600);">Link externo</div>
                     </label>
                 </div>
             </div>
@@ -93,6 +86,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("postForm");
     const message = document.getElementById("message");
     const camposDinamicos = document.getElementById("campos-dinamicos");
+    const tipoOptions = document.getElementById("tipo-options");
+    
+    // USUARIOS AUTORIZADOS PARA PUBLICAR OPORTUNIDADES
+    const AUTHORIZED_EMAILS = [
+        'contacto.clasehoy@hotmail.com',
+        'fjoc.20.05@gmail.com',
+        'polett.alvarado@outlook.cl'
+    ];
     
     // Escuchar cambios en tipo de publicación
     document.querySelectorAll('input[name="tipo"]').forEach(radio => {
@@ -235,6 +236,44 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        // VERIFICAR SI EL USUARIO ESTÁ AUTORIZADO PARA OPORTUNIDADES
+        const isAuthorized = AUTHORIZED_EMAILS.includes(user.email.toLowerCase());
+        
+        if (isAuthorized) {
+            // Mostrar las 3 opciones (grid 3 columnas)
+            tipoOptions.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            tipoOptions.innerHTML = `
+                <label class="tipo-card">
+                    <input type="radio" name="tipo" value="ofrezco" required style="display: none;">
+                    <div class="tipo-icon" style="font-size: 3rem; margin-bottom: 10px;">👋</div>
+                    <div class="tipo-title" style="font-weight: 700; color: var(--purple-dark); margin-bottom: 5px; font-size: 15px;">OFREZCO</div>
+                    <div class="tipo-subtitle" style="font-size: 12px; color: var(--gray-600);">Soy profesional</div>
+                </label>
+                
+                <label class="tipo-card">
+                    <input type="radio" name="tipo" value="busco" required style="display: none;">
+                    <div class="tipo-icon" style="font-size: 3rem; margin-bottom: 10px;">🏫</div>
+                    <div class="tipo-title" style="font-weight: 700; color: var(--purple-dark); margin-bottom: 5px; font-size: 15px;">BUSCO</div>
+                    <div class="tipo-subtitle" style="font-size: 12px; color: var(--gray-600);">Soy institución</div>
+                </label>
+
+                <label class="tipo-card">
+                    <input type="radio" name="tipo" value="oportunidad" required style="display: none;">
+                    <div class="tipo-icon" style="font-size: 3rem; margin-bottom: 10px;">🔍</div>
+                    <div class="tipo-title" style="font-weight: 700; color: var(--purple-dark); margin-bottom: 5px; font-size: 15px;">OPORTUNIDAD</div>
+                    <div class="tipo-subtitle" style="font-size: 12px; color: var(--gray-600);">Link externo</div>
+                </label>
+            `;
+            
+            // Re-agregar listeners
+            document.querySelectorAll('input[name="tipo"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    mostrarCampos(e.target.value);
+                });
+            });
+        }
+        // Si no está autorizado, solo muestra OFREZCO y BUSCO (ya están por defecto)
+
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
 
@@ -249,6 +288,13 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!tipo) {
                 message.style.color = "red";
                 message.innerText = "⚠️ Selecciona el tipo de publicación";
+                return;
+            }
+
+            // VERIFICAR AUTORIZACIÓN PARA OPORTUNIDADES
+            if (tipo === 'oportunidad' && !isAuthorized) {
+                message.style.color = "red";
+                message.innerText = "⚠️ No tienes permiso para publicar oportunidades detectadas";
                 return;
             }
 

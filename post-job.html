@@ -9,30 +9,37 @@
 <body>
 
 <div class="auth-container">
-    <div class="auth-card" style="max-width: 650px;">
+    <div class="auth-card" style="max-width: 700px;">
         <h2 style="color: var(--purple-dark); text-align: center; margin-bottom: 10px;">📝 Publicar Aviso</h2>
         <p style="text-align: center; color: var(--gray-600); margin-bottom: 30px;">Tu aviso estará visible por 24 horas</p>
 
         <form id="postForm">
 
             <!-- TIPO DE PUBLICACIÓN -->
-            <div style="margin-bottom: 25px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px;">
-                <label style="color: white; font-weight: 600; display: block; margin-bottom: 15px; font-size: 16px;">
+            <div style="margin-bottom: 30px; padding: 25px; background: var(--primary-gradient); border-radius: 16px;">
+                <label style="color: white; font-weight: 700; display: block; margin-bottom: 20px; font-size: 17px; text-align: center;">
                     ¿Qué estás publicando?
                 </label>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <label class="tipo-card" style="background: white; padding: 20px; border-radius: 12px; cursor: pointer; text-align: center; transition: all 0.3s;">
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                    <label class="tipo-card">
                         <input type="radio" name="tipo" value="ofrezco" required style="display: none;">
-                        <div class="tipo-icon" style="font-size: 2.5rem; margin-bottom: 10px;">👋</div>
-                        <div class="tipo-title" style="font-weight: 700; color: var(--purple-dark); margin-bottom: 5px;">OFREZCO</div>
-                        <div class="tipo-subtitle" style="font-size: 13px; color: var(--gray-600);">Soy profesional disponible</div>
+                        <div class="tipo-icon" style="font-size: 3rem; margin-bottom: 10px;">👋</div>
+                        <div class="tipo-title" style="font-weight: 700; color: var(--purple-dark); margin-bottom: 5px; font-size: 15px;">OFREZCO</div>
+                        <div class="tipo-subtitle" style="font-size: 12px; color: var(--gray-600);">Soy profesional</div>
                     </label>
                     
-                    <label class="tipo-card" style="background: white; padding: 20px; border-radius: 12px; cursor: pointer; text-align: center; transition: all 0.3s;">
+                    <label class="tipo-card">
                         <input type="radio" name="tipo" value="busco" required style="display: none;">
-                        <div class="tipo-icon" style="font-size: 2.5rem; margin-bottom: 10px;">🏫</div>
-                        <div class="tipo-title" style="font-weight: 700; color: var(--purple-dark); margin-bottom: 5px;">BUSCO</div>
-                        <div class="tipo-subtitle" style="font-size: 13px; color: var(--gray-600);">Soy institución contratando</div>
+                        <div class="tipo-icon" style="font-size: 3rem; margin-bottom: 10px;">🏫</div>
+                        <div class="tipo-title" style="font-weight: 700; color: var(--purple-dark); margin-bottom: 5px; font-size: 15px;">BUSCO</div>
+                        <div class="tipo-subtitle" style="font-size: 12px; color: var(--gray-600);">Soy institución</div>
+                    </label>
+
+                    <label class="tipo-card">
+                        <input type="radio" name="tipo" value="oportunidad" required style="display: none;">
+                        <div class="tipo-icon" style="font-size: 3rem; margin-bottom: 10px;">🔍</div>
+                        <div class="tipo-title" style="font-weight: 700; color: var(--purple-dark); margin-bottom: 5px; font-size: 15px;">OPORTUNIDAD</div>
+                        <div class="tipo-subtitle" style="font-size: 12px; color: var(--gray-600);">Link externo</div>
                     </label>
                 </div>
             </div>
@@ -50,9 +57,9 @@
                         style="width: 20px; height: 20px; margin-top: 2px; cursor: pointer; flex-shrink: 0;"
                     >
                     <span style="font-size: 13px; color: #856404; line-height: 1.5;">
-                        <strong>⚠️ Importante:</strong> Confirmo que la información publicada es verdadera y acepto que ClaseHoy solo actúa como intermediario tecnológico. 
-                        <a href="terminos.html" target="_blank" style="color: #0f4c81; font-weight: 600; text-decoration: none;">
-                            Ver términos completos
+                        <strong>⚠️ Importante:</strong> Confirmo que la información es verdadera y acepto los 
+                        <a href="terminos.html" target="_blank" style="color: #0f4c81; font-weight: 600; text-decoration: underline;">
+                            términos y condiciones
                         </a>
                     </span>
                 </label>
@@ -64,7 +71,7 @@
 
         </form>
 
-        <p id="message" style="margin-top: 15px; font-weight: 600;"></p>
+        <p id="message" style="margin-top: 15px; font-weight: 600; text-align: center;"></p>
 
         <p style="text-align: center; margin-top: 20px;">
             <a href="index.html" style="color: var(--gray-600); font-size: 14px; text-decoration: none;">
@@ -87,18 +94,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const message = document.getElementById("message");
     const camposDinamicos = document.getElementById("campos-dinamicos");
     
-    // Estilos para las cards seleccionadas
-    const style = document.createElement('style');
-    style.textContent = `
-        .tipo-card input:checked + .tipo-icon { transform: scale(1.2); }
-        .tipo-card:has(input:checked) {
-            border: 3px solid var(--purple-medium) !important;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-        }
-        .tipo-card:hover { transform: translateY(-4px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
-    `;
-    document.head.appendChild(style);
-
     // Escuchar cambios en tipo de publicación
     document.querySelectorAll('input[name="tipo"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
@@ -113,12 +108,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 <select id="profesion" required>
                     <option value="">📚 Tu profesión o cargo</option>
-                    ${ChileData.subjects.map(p => `<option>${p}</option>`).join('')}
+                    ${ChileData.subjects.map(p => `<option value="${p}">${p}</option>`).join('')}
                 </select>
 
                 <select id="region" required>
                     <option value="">📍 Región donde ofreces tus servicios</option>
-                    ${ChileData.getRegionNames().map(r => `<option>${r}</option>`).join('')}
+                    ${ChileData.getRegionNames().map(r => `<option value="${r}">${r}</option>`).join('')}
                 </select>
 
                 <select id="comuna" required>
@@ -127,28 +122,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 <select id="disponibilidad" required>
                     <option value="">⏰ Tu disponibilidad</option>
-                    <option>Disponible inmediato</option>
-                    <option>A partir de la próxima semana</option>
-                    <option>Completando horario</option>
-                    <option>Fines de semana</option>
-                    <option>Media jornada</option>
-                    <option>Jornada completa</option>
+                    <option value="Disponible inmediato">Disponible inmediato</option>
+                    <option value="A partir de la próxima semana">A partir de la próxima semana</option>
+                    <option value="Completando horario">Completando horario</option>
+                    <option value="Fines de semana">Fines de semana</option>
+                    <option value="Media jornada">Media jornada</option>
+                    <option value="Jornada completa">Jornada completa</option>
                 </select>
 
                 <textarea id="descripcion" placeholder="✍️ Describe brevemente tu experiencia (opcional)" rows="3" style="width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--gray-200); font-size: 15px; font-family: inherit; resize: vertical;"></textarea>
             `;
-        } else {
+        } else if (tipo === 'busco') {
             camposDinamicos.innerHTML = `
                 <input type="text" id="nombre" placeholder="🏫 Nombre de la institución" required>
 
                 <select id="profesion" required>
                     <option value="">📚 Profesión o cargo que buscas</option>
-                    ${ChileData.subjects.map(p => `<option>${p}</option>`).join('')}
+                    ${ChileData.subjects.map(p => `<option value="${p}">${p}</option>`).join('')}
                 </select>
 
                 <select id="region" required>
                     <option value="">📍 Región de la institución</option>
-                    ${ChileData.getRegionNames().map(r => `<option>${r}</option>`).join('')}
+                    ${ChileData.getRegionNames().map(r => `<option value="${r}">${r}</option>`).join('')}
                 </select>
 
                 <select id="comuna" required>
@@ -157,15 +152,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 <select id="disponibilidad" required>
                     <option value="">⏰ Tipo de contratación</option>
-                    <option>Reemplazo inmediato</option>
-                    <option>Contrato indefinido</option>
-                    <option>Contrato a plazo fijo</option>
-                    <option>Media jornada</option>
-                    <option>Jornada completa</option>
-                    <option>Por horas</option>
+                    <option value="Reemplazo inmediato">Reemplazo inmediato</option>
+                    <option value="Contrato indefinido">Contrato indefinido</option>
+                    <option value="Contrato a plazo fijo">Contrato a plazo fijo</option>
+                    <option value="Media jornada">Media jornada</option>
+                    <option value="Jornada completa">Jornada completa</option>
+                    <option value="Por horas">Por horas</option>
                 </select>
 
                 <textarea id="descripcion" placeholder="✍️ Describe el puesto y requisitos (opcional)" rows="3" style="width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--gray-200); font-size: 15px; font-family: inherit; resize: vertical;"></textarea>
+            `;
+        } else if (tipo === 'oportunidad') {
+            camposDinamicos.innerHTML = `
+                <input type="text" id="nombre" placeholder="🏫 Nombre de la institución que publica" required>
+
+                <select id="profesion" required>
+                    <option value="">📚 Profesión o cargo de la oferta</option>
+                    ${ChileData.subjects.map(p => `<option value="${p}">${p}</option>`).join('')}
+                </select>
+
+                <select id="region" required>
+                    <option value="">📍 Región de la oferta</option>
+                    ${ChileData.getRegionNames().map(r => `<option value="${r}">${r}</option>`).join('')}
+                </select>
+
+                <select id="comuna" required>
+                    <option value="">🏘️ Seleccione Comuna</option>
+                </select>
+
+                <select id="disponibilidad" required>
+                    <option value="">⏰ Tipo de contratación</option>
+                    <option value="Reemplazo inmediato">Reemplazo inmediato</option>
+                    <option value="Contrato indefinido">Contrato indefinido</option>
+                    <option value="Contrato a plazo fijo">Contrato a plazo fijo</option>
+                    <option value="Media jornada">Media jornada</option>
+                    <option value="Jornada completa">Jornada completa</option>
+                    <option value="Por horas">Por horas</option>
+                </select>
+
+                <input type="url" id="url" placeholder="🔗 URL del aviso original (obligatorio)" required style="width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--gray-200); font-size: 15px;">
+
+                <textarea id="descripcion" placeholder="✍️ Descripción breve de la oferta (opcional)" rows="3" style="width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--gray-200); font-size: 15px; font-family: inherit; resize: vertical;"></textarea>
+
+                <div style="padding: 12px; background: var(--gray-50); border-radius: 10px; border-left: 4px solid var(--purple-medium);">
+                    <p style="margin: 0; font-size: 13px; color: var(--gray-700);">
+                        <strong>ℹ️ Nota:</strong> Las oportunidades detectadas redirigen al link original. No se muestra email de contacto.
+                    </p>
+                </div>
             `;
         }
 
@@ -208,14 +241,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const termsCheckbox = document.getElementById('terms-checkbox-post');
             if (!termsCheckbox.checked) {
                 message.style.color = "red";
-                message.innerText = "⚠️ Debes confirmar la veracidad de la información";
+                message.innerText = "⚠️ Debes aceptar los términos y condiciones";
                 return;
             }
 
             const tipo = document.querySelector('input[name="tipo"]:checked')?.value;
             if (!tipo) {
                 message.style.color = "red";
-                message.innerText = "⚠️ Selecciona si OFRECES o BUSCAS";
+                message.innerText = "⚠️ Selecciona el tipo de publicación";
                 return;
             }
 
@@ -225,24 +258,20 @@ document.addEventListener("DOMContentLoaded", () => {
             const comuna = document.getElementById("comuna").value;
             const disponibilidad = document.getElementById("disponibilidad").value;
             const descripcion = document.getElementById("descripcion")?.value || "";
+            const url = document.getElementById("url")?.value || "";
+
+            // Validar URL para oportunidades
+            if (tipo === 'oportunidad' && !url) {
+                message.style.color = "red";
+                message.innerText = "⚠️ Debes ingresar la URL del aviso original";
+                return;
+            }
 
             const now = new Date();
             const expires = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
             try {
-
-                const existing = await db.collection("posts")
-                    .where("userId","==",user.uid)
-                    .where("expiresAt",">",firebase.firestore.Timestamp.now())
-                    .get();
-
-                if (!existing.empty) {
-                    message.style.color = "red";
-                    message.innerText = "⚠️ Ya tienes un aviso activo. Elimínalo primero o espera 24 horas.";
-                    return;
-                }
-
-                await db.collection("posts").add({
+                const postData = {
                     userId: user.uid,
                     tipo: tipo,
                     nombre,
@@ -251,10 +280,21 @@ document.addEventListener("DOMContentLoaded", () => {
                     comuna,
                     disponibilidad,
                     descripcion,
-                    email: user.email,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     expiresAt: firebase.firestore.Timestamp.fromDate(expires)
-                });
+                };
+
+                // Solo agregar email si NO es oportunidad
+                if (tipo !== 'oportunidad') {
+                    postData.email = user.email;
+                }
+
+                // Solo agregar URL si ES oportunidad
+                if (tipo === 'oportunidad') {
+                    postData.url = url;
+                }
+
+                await db.collection("posts").add(postData);
 
                 message.style.color = "green";
                 message.innerText = "✅ Tu aviso ha sido publicado. Redirigiendo...";

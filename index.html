@@ -3,14 +3,53 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ClaseHoy - Profesores Disponibles</title>
+<title>ClaseHoy - Empleos Educativos</title>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
+<!-- MODAL DE BIENVENIDA -->
+<div id="welcome-modal" class="welcome-modal" style="display: none;">
+    <div class="welcome-content">
+        <h2>👋 ¡Bienvenido a ClaseHoy!</h2>
+        
+        <div class="feature">
+            <div class="feature-icon">🟢</div>
+            <div class="feature-text">
+                <h3>OFREZCO - Profesionales Disponibles</h3>
+                <p>Si eres profesor, asistente o profesional de la educación buscando trabajo, publica tu disponibilidad aquí.</p>
+            </div>
+        </div>
+
+        <div class="feature">
+            <div class="feature-icon">🔵</div>
+            <div class="feature-text">
+                <h3>BUSCO - Instituciones Contratando</h3>
+                <p>Si eres un colegio o institución educativa buscando personal, publica tu vacante aquí.</p>
+            </div>
+        </div>
+
+        <div class="feature">
+            <div class="feature-icon">🟣</div>
+            <div class="feature-text">
+                <h3>OPORTUNIDAD DETECTADA</h3>
+                <p>Ofertas de empleo educativo encontradas en internet. Haz clic para ir directo a la oferta original.</p>
+            </div>
+        </div>
+
+        <p style="text-align: center; color: var(--gray-600); margin-top: 20px; font-size: 14px;">
+            ⏰ Todos los avisos duran 24 horas
+        </p>
+
+        <button class="btn-close-welcome" onclick="closeWelcomeModal()">
+            ✅ Entendido, ver avisos
+        </button>
+    </div>
+</div>
+
 <div class="main-header">
     <h1>📚 ClaseHoy</h1>
-    <p>La plataforma colaborativa de empleos educativos más grande de Chile</p>
+    <p>La plataforma colaborativa de empleos educativa más grande de Chile</p>
 </div>
 
 <div class="auth-card">
@@ -20,9 +59,10 @@
     <!-- FILTROS -->
     <div class="filters">
         <select id="filter-tipo">
-            <option value="">🔄 Todo (Ofrezco y Busco)</option>
-            <option value="ofrezco">👋 Solo OFREZCO</option>
-            <option value="busco">🏫 Solo BUSCO</option>
+            <option value="">🔄 Todo (Ofrezco, Busco y Oportunidades)</option>
+            <option value="ofrezco">🟢 Solo OFREZCO</option>
+            <option value="busco">🔵 Solo BUSCO</option>
+            <option value="oportunidad">🟣 Solo OPORTUNIDADES</option>
         </select>
 
         <select id="filter-region">
@@ -38,12 +78,8 @@
         </select>
     </div>
 
-    <!-- Contenedor de posts -->
-    <div id="posts-container">
-        <div class="no-posts">
-            <p>⏳ Cargando avisos...</p>
-        </div>
-    </div>
+    <!-- POSTS -->
+    <div id="posts-container"></div>
 </div>
 
 <!-- Contenedor de notificaciones -->
@@ -56,6 +92,17 @@
 <script src="assets/js/chile-data.js"></script>
 
 <script>
+// MODAL DE BIENVENIDA
+function closeWelcomeModal() {
+    document.getElementById('welcome-modal').style.display = 'none';
+    localStorage.setItem('clasehoy_welcome_seen', 'true');
+}
+
+// Mostrar modal si es primera visita
+if (!localStorage.getItem('clasehoy_welcome_seen')) {
+    document.getElementById('welcome-modal').style.display = 'flex';
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 
     const postsContainer = document.getElementById("posts-container");
@@ -72,7 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* ---------- POBLAR FILTROS ---------- */
     console.log('Iniciando población de filtros...');
-    console.log('ChileData disponible:', typeof ChileData !== 'undefined');
     
     // Regiones
     if (ChileData && ChileData.getRegionNames) {
@@ -82,21 +128,16 @@ document.addEventListener("DOMContentLoaded", () => {
             option.textContent = region;
             filterRegion.appendChild(option);
         });
-        console.log('Regiones pobladas:', filterRegion.options.length - 1);
     }
 
     // Profesiones
     if (ChileData && ChileData.subjects) {
-        console.log('Número de profesiones:', ChileData.subjects.length);
         ChileData.subjects.forEach(profesion => {
             const option = document.createElement('option');
             option.value = profesion;
             option.textContent = profesion;
             filterProfesion.appendChild(option);
         });
-        console.log('Profesiones pobladas:', filterProfesion.options.length - 1);
-    } else {
-        console.error('ChileData.subjects no está disponible');
     }
 
     // Actualizar comunas cuando cambia región
@@ -129,8 +170,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const comuna = filterComuna.value;
         const profesion = filterProfesion.value;
 
-        console.log('Filtros aplicados:', { tipo, region, comuna, profesion });
-
         const filtered = allPosts.filter(post => {
             const matchTipo = !tipo || post.tipo === tipo;
             const matchRegion = !region || post.region === region;
@@ -140,24 +179,29 @@ document.addEventListener("DOMContentLoaded", () => {
             return matchTipo && matchRegion && matchComuna && matchProfesion;
         });
 
-        console.log('Posts filtrados:', filtered.length, 'de', allPosts.length);
         renderPosts(filtered);
     }
 
     /* ---------- AUTH ---------- */
     firebase.auth().onAuthStateChanged(user => {
         currentUser = user;
-
+        
         if (user) {
             navButtons.innerHTML = `
                 <a href="post-job.html" class="btn-primary">📝 Publicar Aviso</a>
-                <button onclick="logout()" class="btn-secondary">🚪 Salir</button>
+                <button onclick="logout()" class="btn-secondary">🚪 Cerrar Sesión</button>
             `;
         } else {
             navButtons.innerHTML = `
-                <a href="login.html" class="btn-primary">🔑 Ingresar</a>
+                <a href="login.html" class="btn-primary">🔐 Iniciar Sesión</a>
                 <a href="register.html" class="btn-secondary">✨ Registrarse</a>
             `;
+        }
+
+        if (firstLoad) {
+            firstLoad = false;
+        } else {
+            showNotification(user ? '✅ Sesión iniciada' : '👋 Sesión cerrada', 'success');
         }
     });
 
@@ -218,49 +262,71 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         postsContainer.innerHTML = posts.map(post => {
-            const tipoBadge = post.tipo === 'ofrezco' 
-                ? '<span style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;">👋 OFREZCO</span>'
-                : '<span style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;">🏫 BUSCO</span>';
+            const tipoClass = `tipo-${post.tipo}`;
+            let badgeHTML = '';
+            let contactHTML = '';
             
-            const tipoTexto = post.tipo === 'ofrezco' ? 'Profesional' : 'Institución';
+            // Determinar badge según tipo
+            if (post.tipo === 'ofrezco') {
+                badgeHTML = '<span class="badge-tipo badge-ofrezco">👋 OFREZCO</span>';
+            } else if (post.tipo === 'busco') {
+                badgeHTML = '<span class="badge-tipo badge-busco">🏫 BUSCO</span>';
+            } else if (post.tipo === 'oportunidad') {
+                badgeHTML = '<span class="badge-tipo badge-oportunidad">🟣 OPORTUNIDAD DETECTADA</span>';
+            }
+            
+            // Determinar botón de contacto según tipo
+            if (post.tipo === 'oportunidad') {
+                // Para oportunidades, botón que abre link externo
+                contactHTML = `
+                    <a href="${post.url}" target="_blank" rel="noopener noreferrer" class="btn-view-opportunity" style="text-decoration: none; display: block; text-align: center;">
+                        🔗 Ver Oferta Completa
+                    </a>
+                `;
+            } else {
+                // Para ofrezco y busco, mostrar email solo si está logueado
+                if (currentUser) {
+                    contactHTML = `
+                        <button onclick="showContact('${post.email}')" class="btn-contact">
+                            📧 Ver Contacto
+                        </button>
+                    `;
+                } else {
+                    contactHTML = `
+                        <div class="post-contact-locked">
+                            <p>🔒 <a href="login.html">Inicia sesión</a> para ver el contacto</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            const tipoTexto = post.tipo === 'ofrezco' ? 'Profesional' : (post.tipo === 'busco' ? 'Institución' : 'Oportunidad');
+            const tipoIcon = post.tipo === 'ofrezco' ? '👤' : (post.tipo === 'busco' ? '🏫' : '🔍');
             
             return `
-                <div class="post-card">
+                <div class="post-card ${tipoClass}">
+                    ${badgeHTML}
+                    
                     <div class="post-header">
-                        <div>
-                            ${tipoBadge}
-                            <h3 style="margin-top: 10px;">${post.profesion}</h3>
-                        </div>
+                        <h3>${post.profesion}</h3>
                         <span class="post-time ${post.timeRemaining === 'Expirado' ? 'expired' : ''}">
                             ⏰ ${post.timeRemaining}
                         </span>
                     </div>
                     
                     <div class="post-body">
-                        <p><strong>${post.tipo === 'ofrezco' ? '👤' : '🏫'} ${tipoTexto}:</strong> ${post.nombre}</p>
+                        <p><strong>${tipoIcon} ${tipoTexto}:</strong> ${post.nombre}</p>
                         <p><strong>📚 ${post.tipo === 'ofrezco' ? 'Profesión' : 'Busca'}:</strong> ${post.profesion}</p>
                         <p><strong>📍 Ubicación:</strong> ${post.comuna}, ${post.region}</p>
                         <p><strong>⏰ ${post.tipo === 'ofrezco' ? 'Disponibilidad' : 'Tipo'}:</strong> ${post.disponibilidad}</p>
-                        ${post.descripcion ? `<p style="margin-top: 10px; padding: 10px; background: #f9fafb; border-radius: 8px; font-size: 13px; color: #4b5563;"><strong>📝 Info:</strong> ${post.descripcion}</p>` : ''}
+                        ${post.descripcion ? `<p style="margin-top: 10px; padding: 12px; background: var(--gray-50); border-radius: 10px; font-size: 14px; color: var(--gray-700); line-height: 1.6;"><strong>📝 Info adicional:</strong> ${post.descripcion}</p>` : ''}
                         
-                        ${currentUser ? `
-                            <div class="post-contact">
-                                <button onclick="showContact('${post.email}')" class="btn-contact">
-                                    📧 Ver Contacto
-                                </button>
-                            </div>
-                        ` : `
-                            <div class="post-contact-locked">
-                                <p>🔒 <a href="login.html">Inicia sesión</a> para ver el contacto</p>
-                            </div>
-                        `}
+                        ${contactHTML}
                         
                         ${currentUser && currentUser.uid === post.userId ? `
-                            <div class="post-actions">
-                                <button onclick="deletePost('${post.id}')" class="btn-delete">
-                                    🗑️ Eliminar mi aviso
-                                </button>
-                            </div>
+                            <button onclick="deletePost('${post.id}')" class="btn-delete">
+                                🗑️ Eliminar mi aviso
+                            </button>
                         ` : ''}
                     </div>
                 </div>
@@ -270,33 +336,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* ---------- FIRESTORE ---------- */
     db.collection("posts")
-      .where("expiresAt", ">", firebase.firestore.Timestamp.now())
-      .orderBy("expiresAt", "desc")
-      .onSnapshot(snapshot => {
-
-        if (!firstLoad) {
-            snapshot.docChanges().forEach(change => {
-                if (change.type === "added") {
-                    showNotification('🔔 Nuevo profesor disponible', 'success');
-                }
-            });
-        }
-        firstLoad = false;
-
-        allPosts = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            allPosts.push({
+        .where("expiresAt", ">", firebase.firestore.Timestamp.now())
+        .orderBy("expiresAt")
+        .orderBy("createdAt", "desc")
+        .onSnapshot(snapshot => {
+            allPosts = snapshot.docs.map(doc => ({
                 id: doc.id,
-                ...data,
-                timeRemaining: getTimeRemaining(data.expiresAt)
-            });
+                ...doc.data(),
+                timeRemaining: getTimeRemaining(doc.data().expiresAt)
+            }));
+            
+            applyFilters();
+            
+            // Actualizar tiempo restante cada minuto
+            setInterval(() => {
+                allPosts = allPosts.map(post => ({
+                    ...post,
+                    timeRemaining: getTimeRemaining(post.expiresAt)
+                }));
+                applyFilters();
+            }, 60000);
+        }, error => {
+            console.error("Error al cargar avisos:", error);
+            postsContainer.innerHTML = `
+                <div class="no-posts">
+                    <p>⚠️ Error al cargar avisos. Recarga la página.</p>
+                </div>
+            `;
         });
 
-        applyFilters();
-    });
-
 });
+
 </script>
 
 </body>

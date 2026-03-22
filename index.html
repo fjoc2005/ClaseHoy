@@ -343,32 +343,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* ---------- FIRESTORE ---------- */
+    /* ---------- FIRESTORE CONSULTA SIMPLE (SIN ÍNDICES) ---------- */
     db.collection("posts")
-        .where("expiresAt", ">", firebase.firestore.Timestamp.now())
-        .orderBy("expiresAt")
         .orderBy("createdAt", "desc")
         .onSnapshot(snapshot => {
-            allPosts = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data(),
-                timeRemaining: getTimeRemaining(doc.data().expiresAt)
-            }));
+            const now = new Date();
+            allPosts = snapshot.docs
+                .map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                    timeRemaining: getTimeRemaining(doc.data().expiresAt)
+                }))
+                .filter(post => {
+                    // Filtrar solo posts no expirados
+                    if (!post.expiresAt) return false;
+                    return post.expiresAt.toDate() > now;
+                });
             
             applyFilters();
-            
-            // Actualizar tiempo restante cada minuto
-            setInterval(() => {
-                allPosts = allPosts.map(post => ({
-                    ...post,
-                    timeRemaining: getTimeRemaining(post.expiresAt)
-                }));
-                applyFilters();
-            }, 60000);
         }, error => {
             console.error("Error al cargar avisos:", error);
             postsContainer.innerHTML = `
                 <div class="no-posts">
-                    <p>⚠️ Error al cargar avisos. Recarga la página.</p>
+                    <h3>⚠️ Error al cargar</h3>
+                    <p>Por favor recarga la página</p>
                 </div>
             `;
         });

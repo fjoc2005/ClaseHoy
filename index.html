@@ -29,15 +29,7 @@
             </div>
         </div>
 
-        <div class="feature">
-            <div class="feature-icon">🟣</div>
-            <div class="feature-text">
-                <h3>OPORTUNIDAD DETECTADA</h3>
-                <p>Ofertas de empleo educativo encontradas en internet. Haz clic para ir directo a la oferta original.</p>
-            </div>
-        </div>
-
-        <p style="text-align: center; color: var(--gray-600); margin-top: 20px; font-size: 14px;">
+        <p style="text-align: center; color: var(--text-medium); margin-top: 20px; font-size: 14px;">
             ⏰ Todos los avisos duran 24 horas
         </p>
 
@@ -48,8 +40,10 @@
 </div>
 
 <div class="main-header">
-    <img src="assets/images/logo.png" alt="ClaseHoy - Plataforma de empleos educativos">
-    <p>La plataforma colaborativa de empleos educativa más grande de Chile</p>
+    <div class="logo-text">
+        <h1>ClaseHoy</h1>
+    </div>
+    <p class="slogan">La plataforma colaborativa de empleos educativos más grande de Chile</p>
 </div>
 
 <div class="auth-card">
@@ -59,10 +53,9 @@
     <!-- FILTROS -->
     <div class="filters">
         <select id="filter-tipo">
-            <option value="">🔄 Todo (Ofrezco, Busco y Oportunidades)</option>
+            <option value="">🔄 Todos los avisos</option>
             <option value="ofrezco">🟢 Solo OFREZCO</option>
             <option value="busco">🔵 Solo BUSCO</option>
-            <option value="oportunidad">🟣 Solo OPORTUNIDADES</option>
         </select>
 
         <select id="filter-region">
@@ -80,6 +73,12 @@
 
     <!-- POSTS -->
     <div id="posts-container"></div>
+    
+    <!-- FOOTER CONTACTO -->
+    <div class="footer-contact">
+        <p>¿Necesitas ayuda o tienes alguna consulta?</p>
+        <p>📧 Contáctanos: <a href="mailto:contacto.clasehoy@gmail.com">contacto.clasehoy@gmail.com</a></p>
+    </div>
 </div>
 
 <!-- Contenedor de notificaciones -->
